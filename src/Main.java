@@ -35,10 +35,10 @@ public class Main extends Application {
 	
 	static int height = 600;
 	static int width = 600;
-    static Board board = new Board();
     static int[] buttonPressed = new int[2];
     static boolean playerBlue = false;
     static boolean playerWhite = false;
+    static Board board;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -49,14 +49,65 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 
 		try {
-			
-			
-			//TODO IMPLEMTENT START SCREEN THAT SELECTS IF TWO HUMANS ARE PLAYING,
-			//OR WHICH COLOR THER WOULD LIKE TO PLAY AGAINST THE COMPUTER
-			
-			
-			updateBoard(primaryStage);
+			board = new Board();
+			primaryStage.setTitle("Starting Screen");
 
+			Label label = new Label("Checkers!");
+
+			label.setFont(new Font("Arial", 60));
+			label.setLayoutX(80);
+
+	        Button button1 = new Button("Human vs Human");
+	        Button button2 = new Button("Human vs AI");
+  			button1.setStyle("-fx-font-size:20;");
+  			button2.setStyle("-fx-font-size:20;");
+
+	        button1.setPrefHeight(40);
+	        button1.setPrefWidth(220);
+	        button2.setPrefHeight(40);
+	        button2.setPrefWidth(220);
+
+
+	        Pane root = new Pane();
+	        button1.setLayoutX(140);
+	        button1.setLayoutY(200);
+	        button2.setLayoutX(140);
+	        button2.setLayoutY(250);
+
+
+	        root.getChildren().add(button1);
+	        root.getChildren().add(button2);
+	        root.getChildren().add(label);
+	        
+	        Board board = new Board();
+
+	        button1.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
+	            @Override public void handle(ActionEvent e) {
+	            	
+	            	playerBlue = true;
+	            	playerWhite = true;
+	            	
+	        		updateBoard(primaryStage);
+	            }
+	        });
+
+	        button2.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
+	            @Override public void handle(ActionEvent e) {
+	            	
+	            	playerBlue = true;
+	            	playerWhite = false;
+	            	
+	        		updateBoard(primaryStage);
+	            }
+	        });
+	        
+
+			Scene scene = new Scene(root,500,500);
+
+			primaryStage.setScene(scene);
+			primaryStage.show();
+
+	        
 			new AnimationTimer() {
 				@Override
 				public void handle(long now) {
@@ -73,6 +124,7 @@ public class Main extends Application {
 	}
 	
 	public static void updateBoard(Stage primaryStage) {
+		
 		primaryStage.setTitle("Starting Screen");
 		
 		char turn = board.getTurn();
@@ -117,13 +169,13 @@ public class Main extends Application {
 					
 					rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-			            @Override
+						@Override
 			            public void handle(MouseEvent event) {
 			                if (buttonPressed[0] != -1 && buttonPressed[1] != -1) {
 			                	int[] target = new int[2];
 			                	 target[0] = GridPane.getRowIndex(rectangle);
 		        			     target[1] = GridPane.getColumnIndex(rectangle);
-		        			     if (board.trySwap(target, buttonPressed)) {
+		        			     if (board.doSwap(target, buttonPressed)) {
 		        			    	 updateBoard(primaryStage);
 		        			     }
 			                }
@@ -166,15 +218,18 @@ public class Main extends Application {
 	        	        bt.setPrefSize(80, 65);
 	        			bt.setStyle("-fx-background-color: White;" + "-fx-font-size:25;");
 	        			
-	        			bt.setOnAction(new EventHandler<ActionEvent>() {
-	        			    @Override public void handle(ActionEvent e) {
-	        			    	
-	        			        buttonPressed[0] = GridPane.getRowIndex(bt);
-	        			        buttonPressed[1] = GridPane.getColumnIndex(bt);
-
-	        			    }
-	        			});
-	        			
+	         			if (playerWhite == true) {
+	             			bt.setOnAction(new EventHandler<ActionEvent>() {
+		        			    @Override public void handle(ActionEvent e) {
+		        			    	
+		        			        buttonPressed[0] = GridPane.getRowIndex(bt);
+		        			        buttonPressed[1] = GridPane.getColumnIndex(bt);
+		 
+		        			        
+		        			    }
+		        			});
+	        			}
+	         			
 	        			grid.add(bt, i, j);
 	        		}
 	        		if (board.getPiece(i, j) == 'X') {
@@ -203,15 +258,17 @@ public class Main extends Application {
 	        			bt.setPrefSize(80, 65);
 	        			bt.setStyle("-fx-background-color: White");
 	        			
-	        			bt.setOnAction(new EventHandler<ActionEvent>() {
-	        			    @Override public void handle(ActionEvent e) {
-	        			    	
-	        			        buttonPressed[0] = GridPane.getRowIndex(bt);
-	        			        buttonPressed[1] = GridPane.getColumnIndex(bt);
-	 
-	        			        
-	        			    }
-	        			});
+	        			if (playerWhite == true) {
+	             			bt.setOnAction(new EventHandler<ActionEvent>() {
+		        			    @Override public void handle(ActionEvent e) {
+		        			    	
+		        			        buttonPressed[0] = GridPane.getRowIndex(bt);
+		        			        buttonPressed[1] = GridPane.getColumnIndex(bt);
+		 
+		        			        
+		        			    }
+		        			});
+	        			}
 	        			grid.add(bt, i, j);
 	        			
 	        		}
@@ -219,6 +276,12 @@ public class Main extends Application {
 	        	}
 	        }
 
+	        if (playerWhite == false && turn == 'x') {
+	        	board.setTurn('X');
+	        	board = computerPlayer();
+	        	updateBoard(primaryStage);
+	        }
+	        
 			Scene scene = new Scene(grid,height,width);
 
 			primaryStage.setScene(scene);
@@ -228,7 +291,53 @@ public class Main extends Application {
 		
 	}
 	
-	public static void computerPlayer() {
+	public static Board computerPlayer() {
+		
+		ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('x');
+		
+		ArrayList<Board> nextBoards = new ArrayList<Board>();		
+
+		
+		for (int i = 0; i < piecesPossible.size(); i++) {	
+			if (board.nextBoards(piecesPossible.get(i), board.getPiece(piecesPossible.get(i).get(0), piecesPossible.get(i).get(1))) != null) {
+				for (Board b: board.nextBoards(piecesPossible.get(i), board.getPiece(piecesPossible.get(i).get(0), piecesPossible.get(i).get(1)))) {
+					nextBoards.add(b);
+				}
+			}
+		}
+		
+		
+		Board highestBoard = new Board(board);
+		
+		if (nextBoards.size() != 0) {
+			
+			char[][] temp = nextBoards.get(0).getPieces();
+			
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					System.out.print(temp[j][i] + " ");
+				}
+				System.out.println();
+			}
+			
+			highestBoard = nextBoards.get(0);
+			
+			for (int i = 0; i < nextBoards.size(); i++) {
+				System.out.println(nextBoards.get(i).getWhiteScore());
+				if (highestBoard.getWhiteScore() < nextBoards.get(i).getWhiteScore()) {
+					highestBoard = nextBoards.get(i);
+				}
+			}
+			
+			
+			board = new Board(highestBoard);
+			
+			return board;
+		}
+		else {
+			return board;
+		}
+	
 		
 	}
 

@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Map;
+
 import javafx.scene.paint.Color;
 
 public class Board {
@@ -10,7 +13,7 @@ public class Board {
 
 	public Board() {
 		
-		turn = 'x';
+		turn = 'X';
 		
 		this.pieces = new char[8][8];
 		
@@ -42,6 +45,33 @@ public class Board {
 
 	}
 	
+	public Board(Board board) {
+		
+		char[][] grid = board.getPieces();
+		
+		turn = board.getTurn();
+		
+		/*
+		if (turn == 'x') {
+			turn = 'X';
+		}
+		else {
+			turn = 'x';
+		}*/
+		
+		this.pieces = new char[8][8];
+		
+		xVal = 12;
+		XVal = 12;
+		
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				pieces[i][j] = grid[i][j];
+			}
+		}
+
+	}
+	
 	public char[][] getPieces(){
 		return pieces;
 	}
@@ -49,31 +79,19 @@ public class Board {
 	public char getPiece(int i, int j) {
 		return pieces[i][j];
 	}
-	
-	public int getValue(){
-		
-		value = 0;
-		
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (pieces[i][j] == 'X') {
-					value++;
-				}
-			}
-		}
-		
-		return value;
-	}
-	
-	
-	public boolean trySwap(int[] target, int[] buttonPressed) {
+
+	public boolean doSwap(int[] target, int[] buttonPressed) {
 		
 		int bpx = buttonPressed[1];
 		int bpy = buttonPressed[0];
 		int targetx = target[1];
 		int targety = target[0];
+		boolean doubleJump = false;
 		
-		char typeOfPiece = pieces[bpx][bpy];
+		
+		if (bpx < 0 || bpy < 0 || targetx < 0 || targety < 0 || bpx > 7 || bpy > 7 || targetx > 7 || targety > 7) {
+			return false;
+		}
 		
 		//handling single moves of reg pieces
 		if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
@@ -128,6 +146,15 @@ public class Board {
 			pieces[targetx-1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -140,6 +167,15 @@ public class Board {
 			pieces[targetx+1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -152,6 +188,15 @@ public class Board {
 			pieces[targetx+1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -164,6 +209,15 @@ public class Board {
 			pieces[targetx-1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -279,6 +333,15 @@ public class Board {
 			pieces[targetx-1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -291,6 +354,15 @@ public class Board {
 			pieces[targetx+1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -303,6 +375,15 @@ public class Board {
 			pieces[targetx+1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -315,6 +396,15 @@ public class Board {
 			pieces[targetx-1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -328,6 +418,15 @@ public class Board {
 			pieces[targetx-1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -340,6 +439,15 @@ public class Board {
 			pieces[targetx+1][targety+1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -352,6 +460,15 @@ public class Board {
 			pieces[targetx+1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
@@ -364,10 +481,174 @@ public class Board {
 			pieces[targetx-1][targety-1] = 'O';
 			pieces[bpx][bpy] = 'O';
 			updateScore();
+			doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+			if (doubleJump) {
+				if (turn == 'x'){
+						turn = 'X';
+				}
+				else {
+					turn = 'x';
+				}
+			}
 			return true;
 		}
 		
 		return false;
+	}
+	
+	
+	public boolean attemptDouble(int bpx, int bpy, char current) {
+		
+		
+		try {
+			//handling doubles of big bois
+			if ((pieces[bpx-2][bpy+2] == 'O') &&
+					((pieces[bpx-1][bpy+1] == 'X') || (pieces[bpx-1][bpy+1] == 'K')) &&
+					(((current == 'k') || (current == 'x')) && turn != 'x')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx-2, bpy+2, replace);
+				pieces[bpx-1][bpy+1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
+				return true;
+			}
+			
+		}catch(Exception e) {
+
+		}
+		
+		try {
+			//handling doubles of big bois
+			if ((pieces[bpx-2][bpy-2] == 'O') &&
+					((pieces[bpx-1][bpy-1] == 'X') || (pieces[bpx-1][bpy-1] == 'K')) &&
+					(((current == 'k') || (current == 'x')) && turn != 'x')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx-2, bpy-2, replace);
+				pieces[bpx+1][bpy+1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+				return true;
+			}
+		}catch(Exception e) {
+
+		}
+		
+		try {
+			//handling doubles of big bois
+			if ((pieces[bpx+2][bpy-2] == 'O') &&
+					((pieces[bpx+1][bpy-1] == 'X') || (pieces[bpx+1][bpy-1] == 'K')) &&
+					(((current == 'k') || (current == 'x')) && turn != 'x')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx+2, bpy-2, replace);
+				pieces[bpx+1][bpy-1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+				return true;
+			}
+			
+		}catch (Exception e) {
+
+		}
+		
+		try {
+			//handling doubles of big bois
+			if ((pieces[bpx+2][bpy+2] == 'O') &&
+					((pieces[bpx+1][bpy+1] == 'X') || (pieces[bpx+1][bpy+1] == 'K')) &&
+					(((current == 'k') || (current == 'x')) && turn != 'x')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx+2, bpy+2, replace);
+				pieces[bpx+1][bpy+1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+				return true;
+			}
+		} catch (Exception e) {
+
+		}
+				
+		try {
+			//handling doubles of small bois
+			if ((pieces[bpx-2][bpy+2] == 'O') &&
+					((pieces[bpx-1][bpy+1] == 'x') || (pieces[bpx-1][bpy+1] == 'k')) &&
+					(((current == 'K') || (current == 'X')) && turn != 'X')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx-2, bpy+2, replace);
+				pieces[bpx-1][bpy+1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
+				return true;
+			}
+		} catch (Exception e) {
+
+		}
+
+		
+		try {
+			//handling doubles of small bois
+			if ((pieces[bpx-2][bpy-2] == 'O') &&
+					((pieces[bpx-1][bpy-1] == 'x') || (pieces[bpx-1][bpy-1] == 'k')) &&
+					(((current == 'K') || (current == 'X')) && turn != 'X')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx-2, bpy-2, replace);
+				pieces[bpx-1][bpy-1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+				return true;
+			}
+		} catch (Exception e) {
+
+		}
+		
+		
+		try {
+			//handling doubles of small bois
+			if ((pieces[bpx+2][bpy-2] == 'O') &&
+					((pieces[bpx+1][bpy-1] == 'x') || (pieces[bpx+1][bpy-1] == 'k')) &&
+					(((current == 'K') || ((current == 'X'))) && turn != 'X')) {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx+2, bpy-2, replace);
+				pieces[bpx+1][bpy-1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+				return true;
+			}
+		} catch (Exception e) {
+		}
+
+		try {
+			//handling doubles of small bois
+			if ((pieces[bpx+2][bpy-2] == 'O') && 
+					((pieces[bpx+1][bpy-1] == 'x') || (pieces[bpx+1][bpy-1] == 'k')) &&
+					(((current == 'K') || (current == 'X'))) && turn != 'X') {
+				char replace = pieces[bpx][bpy];
+				newPlacement(bpx+2, bpy-2, replace);
+				pieces[bpx+1][bpy-1] = 'O';
+				pieces[bpx][bpy] = 'O';
+				updateScore();
+				attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+				return true;
+			}
+			
+		} catch (Exception e) {
+
+		}
+		
+		
+
+		
+		return false;
+
+	}
+	
+	public void setTurn(char c) {
+		turn = c;
 	}
 	
 	public char getTurn()  {
@@ -405,6 +686,53 @@ public class Board {
 		
 	}
 	
+	public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
+		
+		ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
+		int pieceCounter = 0;
+		
+		if (side == 'x') {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (pieces[i][j] == 'x') {
+						
+						pReturned.add(new ArrayList<>());
+						pReturned.get(pieceCounter).add(i);
+						pReturned.get(pieceCounter).add(j);
+						pieceCounter++;
+					}
+					if (pieces[i][j] == 'k') {
+						pReturned.add(new ArrayList<>());
+						pReturned.get(pieceCounter).add(i);
+						pReturned.get(pieceCounter).add(j);
+						pieceCounter++;
+					}
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (pieces[i][j] == 'X') {
+						pReturned.add(new ArrayList<>());
+						pReturned.get(pieceCounter).add(i);
+						pReturned.get(pieceCounter).add(j);
+						pieceCounter++;
+					}
+					if (pieces[i][j] == 'K') {
+						pReturned.add(new ArrayList<>());
+						pReturned.get(pieceCounter).add(i);
+						pReturned.get(pieceCounter).add(j);
+						pieceCounter++;
+					}
+				}
+			}
+		}
+		
+		return pReturned;
+		
+	}
+	
 	
 	public void newPlacement(int x, int y, char replace) {
 		
@@ -437,4 +765,96 @@ public class Board {
 		}
 		
 	}
+	
+	public ArrayList<Board> nextBoards(ArrayList<Integer> current, char curChar){
+		
+		ArrayList<Board> listOfBoard = new ArrayList<Board>();
+		
+		int cur[] = new int[2];
+		int tar[] = new int[2];
+		int bpx = current.get(0);
+		int bpy = current.get(1);
+		
+		cur[0] = bpx;
+		cur[1] = bpy;
+
+		Board temp = new Board(this);
+
+		tar[0] = bpx + 1;
+		tar[0] = bpx + 1;
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		tar[0] = bpx + 1;
+		tar[0] = bpx - 1;
+		temp = new Board(this);
+
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		tar[0] = bpx - 1;
+		tar[0] = bpx + 1;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		
+		tar[0] = bpx + 1;
+		tar[0] = bpx + 1;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		
+		tar[0] = bpx + 2;
+		tar[0] = bpx + 2;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		tar[0] = bpx + 2;
+		tar[0] = bpx - 2;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		tar[0] = bpx - 2;
+		tar[0] = bpx + 2;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}
+		
+		tar[0] = bpx - 2;
+		tar[0] = bpx - 2;
+		temp = new Board(this);
+		
+		temp.setTurn('x');
+		if (temp.doSwap(cur, tar)) {
+			listOfBoard.add(new Board(temp));
+		}	
+
+		return listOfBoard;
+		
+	}
+	
 }
