@@ -140,7 +140,30 @@ public class Main extends Application {
         
         
         if (blueScore == 0 || whiteScore == 0) {
-                    System.out.println("END OF GAME");
+	            primaryStage.setTitle("Ending Screen");
+	
+	            Label label;
+	            if (blueScore == 0) {
+		            label = new Label("END OF GAME! \n\n" + "White wins!");
+	            }
+	            else {
+		            label = new Label("END OF GAME! \n\n" + "Blue wins!");
+	            }
+	            
+	            label.setFont(new Font("Arial", 50));
+	            label.setLayoutX(80);
+
+                System.out.println("END OF GAME");
+                
+                Pane root = new Pane();
+                
+                root.getChildren().add(label);
+                
+                Scene scene = new Scene(root,500,500);
+
+                primaryStage.setScene(scene);
+                primaryStage.show();
+
         }
         else {
                                     
