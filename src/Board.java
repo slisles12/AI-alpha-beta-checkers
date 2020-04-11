@@ -393,10 +393,10 @@ public class Board {
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
-                                            turn = 'X';
+                	turn = 'X';
                 }
                 else {
-                            turn = 'x';
+                	turn = 'x';
                 }
             }
             return true;
@@ -415,10 +415,10 @@ public class Board {
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             if (doubleJump) {
                 if (turn == 'x'){
-                                            turn = 'X';
+                	turn = 'X';
                 }
                 else {
-                            turn = 'x';
+                	turn = 'x';
                 }
             }
             return true;
@@ -492,10 +492,11 @@ public class Board {
               
               
     public boolean attemptDouble(int bpx, int bpy, char current) {
+    	
                     
                     
     try {
-    //handling doubles of big bois
+    	//handling doubles of big bois
         if ((pieces[bpx-2][bpy+2] == 'O') && 
             ((pieces[bpx-1][bpy+1] == 'X') || (pieces[bpx-1][bpy+1] == 'K')) &&
             (((current == 'k') || (current == 'x')) && turn != 'x')) {
@@ -633,100 +634,97 @@ public class Board {
         } catch (Exception e) {
 
         }
+              
+    return false;
 
-                             
-
-                             
-        return false;
-
-        }
+    }
+    
+    public void setTurn(char c) {
+        turn = c;
+    }
+    
+    public char getTurn()  {
+        return turn;
+    }
+    
+    public int getBlueScore() {
+        return xVal;
+    }
+    
+    public int getWhiteScore() {
+        return XVal;
+    }
+    
+    public void updateScore() {
+        xVal = 0;
+        XVal = 0;
         
-        public void setTurn(char c) {
-            turn = c;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] == 'x') {
+                    XVal++;
+                }
+                if (pieces[i][j] == 'k') {
+                    XVal+= 2;
+                }
+                if (pieces[i][j] == 'X') {
+                    xVal++;
+                }
+                if (pieces[i][j] == 'K') {
+                    xVal+= 2;
+                }
+            }
         }
+                         
+    }
+          
+    public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
+                         
+        ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
+        int pieceCounter = 0;
         
-        public char getTurn()  {
-            return turn;
-        }
-        
-        public int getBlueScore() {
-            return xVal;
-        }
-        
-        public int getWhiteScore() {
-            return XVal;
-        }
-        
-        public void updateScore() {
-            xVal = 0;
-            XVal = 0;
-            
+        if (side == 'x') {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     if (pieces[i][j] == 'x') {
-                        XVal++;
+                                        
+                        pReturned.add(new ArrayList<>());
+                        pReturned.get(pieceCounter).add(j);
+                        pReturned.get(pieceCounter).add(i);
+                                        pieceCounter++;
+                        }
+                        if (pieces[i][j] == 'k') {
+                            pReturned.add(new ArrayList<>());
+                            pReturned.get(pieceCounter).add(j);
+                            pReturned.get(pieceCounter).add(i);
+                            pieceCounter++;
                     }
-                    if (pieces[i][j] == 'k') {
-                        XVal+= 2;
-                    }
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
                     if (pieces[i][j] == 'X') {
-                        xVal++;
+                        pReturned.add(new ArrayList<>());
+                        pReturned.get(pieceCounter).add(j);
+                        pReturned.get(pieceCounter).add(i);
+                        pieceCounter++;
                     }
                     if (pieces[i][j] == 'K') {
-                        xVal+= 2;
+                        pReturned.add(new ArrayList<>());
+                        pReturned.get(pieceCounter).add(j);
+                        pReturned.get(pieceCounter).add(i);
+                        pieceCounter++;
                     }
                 }
             }
-                             
         }
-              
-        public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
-                             
-            ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
-            int pieceCounter = 0;
-            
-            if (side == 'x') {
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        if (pieces[i][j] == 'x') {
-                                            
-                            pReturned.add(new ArrayList<>());
-                            pReturned.get(pieceCounter).add(j);
-                            pReturned.get(pieceCounter).add(i);
-                                            pieceCounter++;
-                            }
-                            if (pieces[i][j] == 'k') {
-                                pReturned.add(new ArrayList<>());
-                                pReturned.get(pieceCounter).add(j);
-                                pReturned.get(pieceCounter).add(i);
-                                pieceCounter++;
-                        }
-                    }
-                }
-            }
-            else {
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        if (pieces[i][j] == 'X') {
-                            pReturned.add(new ArrayList<>());
-                            pReturned.get(pieceCounter).add(j);
-                            pReturned.get(pieceCounter).add(i);
-                            pieceCounter++;
-                        }
-                        if (pieces[i][j] == 'K') {
-                            pReturned.add(new ArrayList<>());
-                            pReturned.get(pieceCounter).add(j);
-                            pReturned.get(pieceCounter).add(i);
-                            pieceCounter++;
-                        }
-                    }
-                }
-            }
-            
-        return pReturned;
-                            
-        }
-            
+        
+    return pReturned;
+                        
+    }
+        
             
     public void newPlacement(int x, int y, char replace) {
                         
@@ -782,77 +780,72 @@ public class Board {
         tar[0] = bpx - 1;
         tar[1] = bpy - 1;
         
-        
-        if (this.turn == 'x') {
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            tar[0] = bpx + 1;
-            tar[1] = bpy - 1;
-            temp = new Board(this);
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            tar[0] = bpx - 1;
-            tar[1] = bpy + 1;
-            temp = new Board(this);
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            
-            tar[0] = bpx + 1;
-            tar[1] = bpy + 1;
-            temp = new Board(this);
-            
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            
-            tar[0] = bpx + 2;
-            tar[1] = bpy + 2;
-            temp = new Board(this);
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            tar[0] = bpx + 2;
-            tar[1] = bpy - 2;
-            temp = new Board(this);
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            tar[0] = bpx - 2;
-            tar[1] = bpy + 2;
-            temp = new Board(this);
-            
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }
-            
-            tar[0] = bpx - 2;
-            tar[1] = bpy - 2;
-            temp = new Board(this);
-            
-
-            if (temp.doSwap(tar, cur)) {
-                listOfBoard.add(new Board(temp));
-            }             
-
-            return listOfBoard;
-            
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
         }
         
-        return null;
+        tar[0] = bpx + 1;
+        tar[1] = bpy - 1;
+        temp = new Board(this);
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        tar[0] = bpx - 1;
+        tar[1] = bpy + 1;
+        temp = new Board(this);
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        
+        tar[0] = bpx + 1;
+        tar[1] = bpy + 1;
+        temp = new Board(this);
+        
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        
+        tar[0] = bpx + 2;
+        tar[1] = bpy + 2;
+        temp = new Board(this);
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        tar[0] = bpx + 2;
+        tar[1] = bpy - 2;
+        temp = new Board(this);
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        tar[0] = bpx - 2;
+        tar[1] = bpy + 2;
+        temp = new Board(this);
+        
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }
+        
+        tar[0] = bpx - 2;
+        tar[1] = bpy - 2;
+        temp = new Board(this);
+        
+
+        if (temp.doSwap(tar, cur)) {
+            listOfBoard.add(new Board(temp));
+        }             
+
+        return listOfBoard;
+
     }
                     
     

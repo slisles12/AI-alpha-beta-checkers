@@ -51,7 +51,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
     try {
-    board = new Board();
+    	board = new Board();
         primaryStage.setTitle("Starting Screen");
 
         Label label = new Label("Checkers!");
@@ -60,13 +60,17 @@ public class Main extends Application {
 
         Button button1 = new Button("Human vs Human");
         Button button2 = new Button("Human vs AI");
+        Button button3 = new Button("AI vs AI");
         button1.setStyle("-fx-font-size:20;");
         button2.setStyle("-fx-font-size:20;");
-
+        button3.setStyle("-fx-font-size:20;");
+        
         button1.setPrefHeight(40);
         button1.setPrefWidth(220);
         button2.setPrefHeight(40);
         button2.setPrefWidth(220);
+        button3.setPrefHeight(40);
+        button3.setPrefWidth(220);
 
 
         Pane root = new Pane();
@@ -74,34 +78,43 @@ public class Main extends Application {
         button1.setLayoutY(200);
         button2.setLayoutX(140);
         button2.setLayoutY(250);
+        button3.setLayoutX(140);
+        button3.setLayoutY(300);
 
 
         root.getChildren().add(button1);
         root.getChildren().add(button2);
+        root.getChildren().add(button3);
         root.getChildren().add(label);
-                      
-        Board board = new Board();
 
         button1.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-            
-            playerBlue = true;
-            playerWhite = true;
-            
-                    updateBoard(primaryStage);
+	            
+	            playerBlue = true;
+	            playerWhite = true;
+                updateBoard(primaryStage);
             }
         });
 
         button2.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
             
-            playerBlue = true;
-            playerWhite = false;
-            
-                    updateBoard(primaryStage);
+	            playerBlue = true;
+	            playerWhite = false;
+                updateBoard(primaryStage);
             }
         });
         
+        
+
+        button3.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            
+	            playerBlue = false;
+	            playerWhite = false;
+                updateBoard(primaryStage);
+            }
+        });
 
         Scene scene = new Scene(root,500,500);
 
@@ -125,15 +138,15 @@ public class Main extends Application {
     }
               
     public static void updateBoard(Stage primaryStage) {
-                    
+
         primaryStage.setTitle("Starting Screen");
-                    
-        char turn = board.getTurn();
+        
 
         GridPane grid = new GridPane();
         
         buttonPressed[0] = -1;
         buttonPressed[1] = -1;
+        
         
         int blueScore = board.getBlueScore();
         int whiteScore = board.getWhiteScore();
@@ -179,6 +192,7 @@ public class Main extends Application {
                         
                     GridPane.setRowIndex(rectangle, j);
                     GridPane.setColumnIndex(rectangle, i);
+                    
 
                     if (i % 2 == 0 && j % 2 == 0) {
                         rectangle.setFill(Color.RED);
@@ -192,8 +206,8 @@ public class Main extends Application {
                     
                     rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-                    @Override
-                        public void handle(MouseEvent event) {
+                    	@Override
+                    	public void handle(MouseEvent event) {
                             if (buttonPressed[0] != -1 && buttonPressed[1] != -1) {
                                 int[] target = new int[2];
                                 target[0] = GridPane.getRowIndex(rectangle);
@@ -222,13 +236,15 @@ public class Main extends Application {
                         bt.setPrefSize(80, 65);
                         bt.setStyle("-fx-background-color: Blue;" +  "-fx-font-size:25;");
                             
-                        bt.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override public void handle(ActionEvent e) {         
-                                buttonPressed[0] = GridPane.getRowIndex(bt);
-                                buttonPressed[1] = GridPane.getColumnIndex(bt);
-                            }
-                        });
-                            
+                        if (playerBlue == true && board.getTurn() == 'X') {
+	                        bt.setOnAction(new EventHandler<ActionEvent>() {
+	                            @Override public void handle(ActionEvent e) {         
+	                                buttonPressed[0] = GridPane.getRowIndex(bt);
+	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
+	                            }
+	                        });
+                        }
+	                            
                         grid.add(bt, i, j);
                     }
                                             
@@ -239,7 +255,7 @@ public class Main extends Application {
                         bt.setPrefSize(80, 65);
                         bt.setStyle("-fx-background-color: White;" + "-fx-font-size:25;");
                         
-                    if (playerWhite == true) {
+                    if (playerWhite == true && board.getTurn() == 'x') {
                         bt.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override public void handle(ActionEvent e) {
                                     buttonPressed[0] = GridPane.getRowIndex(bt);
@@ -258,14 +274,16 @@ public class Main extends Application {
                         bt.setPrefSize(80, 65);
                         bt.setStyle("-fx-background-color: Blue");
                         
-                        bt.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override public void handle(ActionEvent e) {
-                                        
-                                buttonPressed[0] = GridPane.getRowIndex(bt);
-                                buttonPressed[1] = GridPane.getColumnIndex(bt);
-
-                            }
-                        });
+                        if (playerBlue == true && board.getTurn() == 'X') {
+	                        bt.setOnAction(new EventHandler<ActionEvent>() {
+	                            @Override public void handle(ActionEvent e) {
+	                                        
+	                                buttonPressed[0] = GridPane.getRowIndex(bt);
+	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
+	
+	                            }
+	                        });
+                        }
                         
                         grid.add(bt, i, j);
                                                             
@@ -277,7 +295,7 @@ public class Main extends Application {
                         bt.setPrefSize(80, 65);
                         bt.setStyle("-fx-background-color: White");
                         
-                        if (playerWhite == true) {
+                        if (playerWhite == true && board.getTurn() == 'x') {
                             bt.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override public void handle(ActionEvent e) {
                                             
@@ -287,82 +305,158 @@ public class Main extends Application {
                                 }
                             });
                         }
+
                         grid.add(bt, i, j);
                             
                     }
-                                
                 }
             }
-                        
+            
+        	
             Scene scene = new Scene(grid,height,width);
-
             primaryStage.setScene(scene);
             primaryStage.show();
-                                
-            if (playerWhite == false && turn == 'x') {
-                board.setTurn('X');
-                board = computerPlayer();
-                
-                char[][] temp = board.getPieces();
-                
-                System.out.println("\n\n\n");
-                                                
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        System.out.print(temp[j][i] + " ");
-                    }
-                    System.out.println();
-                }
-                
-                board.setTurn('X');
-                updateBoard(primaryStage);
+                        
+
+            if (playerWhite == false && board.getTurn() == 'x') {
+                board = computeWhitePlayer(primaryStage);              
+            } 
+            else if (playerBlue == false && board.getTurn() == 'X') {
+                board = computeBluePlayer(primaryStage);
             }
                                            
         }
                              
     }
+
               
-    public static Board computerPlayer() {
+    public static Board computeWhitePlayer(Stage primaryStage) {
+    	
+    	/*
+    	try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}*/
                     
         ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('x');
                     
         ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-                    
-        board.setTurn('x');
-
-    for (int i = 0; i < piecesPossible.size(); i++) {          
-        if (board.nextBoards(piecesPossible.get(i))!= null) {
-            for (Board b: board.nextBoards(piecesPossible.get(i))) {
-                        nextBoards.add(b);
-            }
-        }
-    }
-                             
-
-    Board highestBoard = new Board(board);
-
-    if (nextBoards.size() != 0) {
-        Random rand = new Random();
-
-        highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
-
-        for (int i = 0; i < nextBoards.size(); i++) {
-            System.out.println(nextBoards.get(i).getBlueScore());
-            if (highestBoard.getBlueScore() > nextBoards.get(i).getBlueScore()) {
-                highestBoard = nextBoards.get(i);
-            }
-        }
-
+	
+	    for (int i = 0; i < piecesPossible.size(); i++) {          
+	        if (board.nextBoards(piecesPossible.get(i))!= null) {
+	            for (Board b: board.nextBoards(piecesPossible.get(i))) {
+	                        nextBoards.add(b);
+	            }
+	        }
+	    }
+	                             
+	
+	    Board highestBoard = new Board(board);
+	
+	    if (nextBoards.size() != 0) {
+	        Random rand = new Random();
+	
+	        highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
+	
+	        for (int i = 0; i < nextBoards.size(); i++) {
+	            System.out.println(nextBoards.get(i).getBlueScore());
+	            if (highestBoard.getBlueScore() > nextBoards.get(i).getBlueScore()) {
+	                highestBoard = nextBoards.get(i);
+	            }
+	        }
+	
 
             board = new Board(highestBoard);
+            
+
+            char[][] temp = board.getPieces();
+            
+            System.out.println("\n\n\n");
+                                            
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    System.out.print(temp[j][i] + " ");
+                }
+                System.out.println();
+            }
+            
+            updateBoard(primaryStage);
 
             return board;
+            
+        }
+	    else {
+	        System.out.println("ERORRRRRRR WHITE");
+	        return board;
+	    }
+
+
+    }
+    
+
+    
+    public static Board computeBluePlayer(Stage primaryStage) {
+    	
+    	/*
+    	try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}*/
+        
+        ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('X');
+                    
+        ArrayList<Board> nextBoards = new ArrayList<Board>();                       
+
+	    for (int i = 0; i < piecesPossible.size(); i++) {          
+	        if (board.nextBoards(piecesPossible.get(i))!= null) {
+	            for (Board b: board.nextBoards(piecesPossible.get(i))) {
+	                        nextBoards.add(b);
+	            }
+	        }
+	    }
+	                             
+	
+	    Board highestBoard = new Board(board);
+	
+	    if (nextBoards.size() != 0) {
+	        Random rand = new Random();
+	
+	        highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
+	
+	        for (int i = 0; i < nextBoards.size(); i++) {
+	            System.out.println(nextBoards.get(i).getBlueScore());
+	            if (highestBoard.getWhiteScore() > nextBoards.get(i).getWhiteScore()) {
+	                highestBoard = nextBoards.get(i);
+	            }
+	        }
+	
+	
+            board = new Board(highestBoard);
+		            
+            char[][] temp = board.getPieces();
+		            
+		            
+            System.out.println("\n\n\n");
+                                            
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    System.out.print(temp[j][i] + " ");
+                }
+                System.out.println();
+            }
+
+            updateBoard(primaryStage);
+
+
+            return board;
+            
         }
         else {
-            System.out.println("ERORRRRRRR ERRRORRRRR");
+            System.out.println("ERORRRRRRR BLUE");
             return board;
         }
-
 
     }
 
