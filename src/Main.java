@@ -40,7 +40,6 @@ public class Main extends Application {
     static int[] buttonPressed = new int[2];
     static boolean playerBlue = false;
     static boolean playerWhite = false;
-    static Board board;
 
     public static void main(String[] args) {
      launch(args);
@@ -51,7 +50,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
     try {
-    	board = new Board();
+    	Board board = new Board();
         primaryStage.setTitle("Starting Screen");
 
         Label label = new Label("Checkers!");
@@ -92,7 +91,7 @@ public class Main extends Application {
 	            
 	            playerBlue = true;
 	            playerWhite = true;
-                updateBoard(primaryStage);
+                updateBoard(primaryStage, board);
             }
         });
 
@@ -101,7 +100,7 @@ public class Main extends Application {
             
 	            playerBlue = true;
 	            playerWhite = false;
-                updateBoard(primaryStage);
+                updateBoard(primaryStage, board);
             }
         });
         
@@ -112,7 +111,7 @@ public class Main extends Application {
             
 	            playerBlue = false;
 	            playerWhite = false;
-                updateBoard(primaryStage);
+                updateBoard(primaryStage, board);
             }
         });
 
@@ -137,10 +136,15 @@ public class Main extends Application {
 
     }
               
-    public static void updateBoard(Stage primaryStage) {
+    public static void updateBoard(Stage primaryStage, Board board) {
+    	
+    	Player players = new Player();
 
+    	final Board otherBoard = board;
+    	
         primaryStage.setTitle("Starting Screen");
         
+        char[][] temp = board.getPieces();
 
         GridPane grid = new GridPane();
         
@@ -152,11 +156,11 @@ public class Main extends Application {
         int whiteScore = board.getWhiteScore();
         
         
-        if (blueScore == 0 || whiteScore == 0) {
+        if (blueScore == 0 || whiteScore == 0 || board.getPiecesLeft('X').size() == 0 || board.getPiecesLeft('x').size() == 0) {
 	            primaryStage.setTitle("Ending Screen");
 	
 	            Label label;
-	            if (blueScore == 0) {
+	            if (blueScore < whiteScore) {
 		            label = new Label("END OF GAME! \n\n" + "White wins!");
 	            }
 	            else {
@@ -212,8 +216,8 @@ public class Main extends Application {
                                 int[] target = new int[2];
                                 target[0] = GridPane.getRowIndex(rectangle);
                                 target[1] = GridPane.getColumnIndex(rectangle);
-                                if (board.doSwap(target, buttonPressed)) {
-                                    updateBoard(primaryStage);
+                                if (otherBoard.doSwap(target, buttonPressed)) {
+                                    updateBoard(primaryStage, otherBoard);
                                 }
                             }
                         }
@@ -249,7 +253,6 @@ public class Main extends Application {
                     }
                                             
                     if (board.getPiece(i, j) == 'k') {
-                                    
                         Button bt = new Button("K");
                         bt.setShape(new Circle(width/8));
                         bt.setPrefSize(80, 65);
@@ -268,7 +271,7 @@ public class Main extends Application {
                         grid.add(bt, i, j);
                     }
                     if (board.getPiece(i, j) == 'X') {
-                        
+ 
                         Button bt = new Button();
                         bt.setShape(new Circle(width/8));
                         bt.setPrefSize(80, 65);
@@ -314,150 +317,23 @@ public class Main extends Application {
             
         	
             Scene scene = new Scene(grid,height,width);
+            System.out.println("showing scene");
             primaryStage.setScene(scene);
             primaryStage.show();
-                        
+            
 
             if (playerWhite == false && board.getTurn() == 'x') {
-                board = computeWhitePlayer(primaryStage);              
+                board = players.computeWhitePlayer(board);
+                updateBoard(primaryStage, board);
             } 
             else if (playerBlue == false && board.getTurn() == 'X') {
-                board = computeBluePlayer(primaryStage);
+                board = players.computeBluePlayer(board);
+                updateBoard(primaryStage, board);
+                
             }
                                            
         }
                              
-    }
-
-              
-    public static Board computeWhitePlayer(Stage primaryStage) {
-    	
-    	/*
-    	try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}*/
-                    
-        ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('x');
-                    
-        ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-	
-	    for (int i = 0; i < piecesPossible.size(); i++) {          
-	        if (board.nextBoards(piecesPossible.get(i))!= null) {
-	            for (Board b: board.nextBoards(piecesPossible.get(i))) {
-	                        nextBoards.add(b);
-	            }
-	        }
-	    }
-	                             
-	
-	    Board highestBoard = new Board(board);
-	
-	    if (nextBoards.size() != 0) {
-	        Random rand = new Random();
-	
-	        highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
-	
-	        for (int i = 0; i < nextBoards.size(); i++) {
-	            System.out.println(nextBoards.get(i).getBlueScore());
-	            if (highestBoard.getBlueScore() > nextBoards.get(i).getBlueScore()) {
-	                highestBoard = nextBoards.get(i);
-	            }
-	        }
-	
-
-            board = new Board(highestBoard);
-            
-
-            char[][] temp = board.getPieces();
-            
-            System.out.println("\n\n\n");
-                                            
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    System.out.print(temp[j][i] + " ");
-                }
-                System.out.println();
-            }
-            
-            updateBoard(primaryStage);
-
-            return board;
-            
-        }
-	    else {
-	        System.out.println("ERORRRRRRR WHITE");
-	        return board;
-	    }
-
-
-    }
-    
-
-    
-    public static Board computeBluePlayer(Stage primaryStage) {
-    	
-    	/*
-    	try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}*/
-        
-        ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('X');
-                    
-        ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-
-	    for (int i = 0; i < piecesPossible.size(); i++) {          
-	        if (board.nextBoards(piecesPossible.get(i))!= null) {
-	            for (Board b: board.nextBoards(piecesPossible.get(i))) {
-	                        nextBoards.add(b);
-	            }
-	        }
-	    }
-	                             
-	
-	    Board highestBoard = new Board(board);
-	
-	    if (nextBoards.size() != 0) {
-	        Random rand = new Random();
-	
-	        highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
-	
-	        for (int i = 0; i < nextBoards.size(); i++) {
-	            System.out.println(nextBoards.get(i).getBlueScore());
-	            if (highestBoard.getWhiteScore() > nextBoards.get(i).getWhiteScore()) {
-	                highestBoard = nextBoards.get(i);
-	            }
-	        }
-	
-	
-            board = new Board(highestBoard);
-		            
-            char[][] temp = board.getPieces();
-		            
-		            
-            System.out.println("\n\n\n");
-                                            
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    System.out.print(temp[j][i] + " ");
-                }
-                System.out.println();
-            }
-
-            updateBoard(primaryStage);
-
-
-            return board;
-            
-        }
-        else {
-            System.out.println("ERORRRRRRR BLUE");
-            return board;
-        }
-
     }
 
 }

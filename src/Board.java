@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 public class Board {
 
     private char[][] pieces;
-    private int value;
     private char turn;
     private int xVal;
     private int XVal;
@@ -662,21 +661,52 @@ public class Board {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (pieces[i][j] == 'x') {
-                    XVal++;
+                    XVal+= 3;
                 }
                 if (pieces[i][j] == 'k') {
-                    XVal+= 2;
+                    XVal+= 5;
                 }
                 if (pieces[i][j] == 'X') {
-                    xVal++;
+                    xVal+= 3;
                 }
                 if (pieces[i][j] == 'K') {
-                    xVal+= 2;
+                    xVal+= 5;
                 }
             }
         }
+        
                          
     }
+    
+    public int getScore(char player) {
+        xVal = 0;
+        XVal = 0;
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] == 'x') {
+                    XVal+= 3;
+                }
+                if (pieces[i][j] == 'k') {
+                    XVal+= 5;
+                }
+                if (pieces[i][j] == 'X') {
+                    xVal+= 3;
+                }
+                if (pieces[i][j] == 'K') {
+                    xVal+= 5;
+                }
+            }
+        }
+        
+        if (player == 'x') {
+        	return XVal - xVal;
+        }
+        
+        return xVal - XVal;
+                         
+    }
+          
           
     public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
                          
@@ -768,10 +798,6 @@ public class Board {
         int bpx = current.get(0);
         int bpy = current.get(1);
         
-
-        System.out.println(bpx + " " + bpx);
-
-        
         cur[0] = bpx;
         cur[1] = bpy;
 
@@ -847,6 +873,19 @@ public class Board {
         return listOfBoard;
 
     }
+    
+
+	public boolean isEqual(Board minBoard) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] != minBoard.getPieces()[i][j]) {
+                	return false;
+                }
+            }
+        }
+        
+        return true;
+	}
                     
     
 }
