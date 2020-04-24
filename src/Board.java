@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Stack;
 
 import javafx.scene.paint.Color;
 
@@ -9,13 +12,15 @@ public class Board {
     private char turn;
     private int xVal;
     private int XVal;
+    private int totalScorex;
+    private int totalScoreX;
+    boolean mustCapture = false;
 
     public Board() {
-        
-        turn = 'X';
-        
+
         this.pieces = new char[8][8];
         
+        turn = 'X';
         xVal = 12;
         XVal = 12;
         
@@ -41,6 +46,11 @@ public class Board {
 
             }
         }
+        
+        
+        
+
+        updateGame();
 
     }
               
@@ -52,17 +62,184 @@ public class Board {
         
         this.pieces = new char[8][8];
         
-        xVal = 12;
-        XVal = 12;
-        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 pieces[i][j] = grid[i][j];
             }
         }
         
-        updateScore();
+        updateGame();
 
+    }
+    
+    
+    public void updateGame() {
+        xVal = 0;
+        XVal = 0;
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] == 'x') {
+                    XVal+= 3;
+                }
+                if (pieces[i][j] == 'k') {
+                    XVal+= 5;
+                }
+                if (pieces[i][j] == 'X') {
+                    xVal+= 3;
+                }
+                if (pieces[i][j] == 'K') {
+                    xVal+= 5;
+                }
+            }
+        } 
+        
+        boolean killConfirmx = false;
+        boolean killConfirmX = false;
+        
+        for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (pieces[i][j] == 'x') {
+					
+					if (i < 6 && j < 6){
+						if (((pieces[i+1][j+1] == 'X') || (pieces[i+1][j+1] == 'K')) && (pieces[i+2][j+2] == 'O') ){
+							killConfirmx = true;
+						}
+					}
+			
+					if (i > 1 && j < 6) {
+						if (((pieces[i-1][j+1] == 'X') || (pieces[i-1][j+1] == 'K')) && (pieces[i-2][j+2] == 'O') ) {
+							killConfirmx = true;
+						}
+					}				
+				}
+				if (pieces[i][j] == 'X') {
+
+					if  (i > 1 && j > 1) {
+						if (((pieces[i-1][j-1] == 'x') || (pieces[i-1][j-1] == 'k')) && (pieces[i-2][j-2] == 'O')){
+							killConfirmX = true;
+						}
+					}
+					
+					if (i < 6 && j > 1) {
+						if (((pieces[i+1][j-1] == 'x') || (pieces[i+1][j-1] == 'k')) && (pieces[i+2][j-2] == 'O')){
+							killConfirmX = true;
+						}
+					}	
+				}
+				if (pieces[i][j] == 'k') {
+					
+					if (i < 6 && j < 6) {
+						if (((pieces[i+1][j+1] == 'X') || (pieces[i+1][j+1] == 'K')) && (pieces[i+2][j+2] == 'O')){
+							killConfirmx = true;
+						}
+					}
+					
+					if  (i < 6 && j > 1) {
+						if (((pieces[i+1][j-1] == 'X') || (pieces[i+1][j-1] == 'K')) && (pieces[i+2][j-2] == 'O')) {
+							killConfirmx = true;
+						}
+					}
+					
+					if (i > 1 && j < 6) {
+						if (((pieces[i-1][j+1] == 'X') || (pieces[i-1][j+1] == 'K')) && (pieces[i-2][j+2] == 'O')){
+							killConfirmx = true;
+						}
+					}
+					
+					if (i > 1 && j > 1) {
+						if (((pieces[i-1][j-1] == 'X') || (pieces[i-1][j-1] == 'K')) && (pieces[i-2][j-2] == 'O')){
+							killConfirmx = true;
+						}
+					}
+					
+				}
+				if (pieces[i][j] == 'K') {
+					
+					if (i < 6 && j < 6) {
+						if (((pieces[i+1][j+1] == 'x') || (pieces[i+1][j+1] == 'k')) && (pieces[i+2][j+2] == 'O')){
+							killConfirmX = true;
+						}
+					}
+			
+					if (i < 6 && j > 1) {
+						if (((pieces[i+1][j-1] == 'x') || (pieces[i+1][j-1] == 'k')) && (pieces[i+2][j-2] == 'O')) {
+							killConfirmX = true;
+						}
+					}
+				
+					if (i > 1 && j < 6) {
+						if (((pieces[i-1][j+1] == 'x') || (pieces[i-1][j+1] == 'k')) && (pieces[i-2][j+2] == 'O')){
+							killConfirmX = true;
+						}
+					}
+					
+					if (j > 1 && i > 1) {
+						if (((pieces[i-1][j-1] == 'x') || (pieces[i-1][j-1] == 'k')) && (pieces[i-2][j-2] == 'O')){
+							killConfirmX = true;
+						}
+					}
+				}
+			}
+		}
+        
+        if (turn == 'x' && killConfirmx == true) {
+        	mustCapture = true;
+        }
+        else if (turn == 'X' && killConfirmX == true) {
+        	mustCapture = true;
+        }
+        else {
+        	mustCapture = false;
+        }
+    	
+    }
+    
+    
+    public int getTotalScore(char player) {
+        
+    	int tempx = 0;
+        int tempX = 0;
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] == 'x') {
+                    tempX+= 3;
+                }
+                if (pieces[i][j] == 'k') {
+                    tempX+= 5;
+                }
+                if (pieces[i][j] == 'X') {
+                    tempx+= 3;
+                }
+                if (pieces[i][j] == 'K') {
+                    tempx+= 5;
+                }
+            }
+        }
+
+        totalScorex = tempX - tempx;           
+
+        totalScoreX = tempx - tempX;
+        
+    	
+    	if (player == 'x') {
+    		return totalScorex;
+    	}
+    	
+    	return totalScoreX;
+                         
+    }
+    
+    public void setTotalScore(char player, int score) {
+        
+    	if (player == 'x') {
+    		totalScorex = score;
+    	}
+    	else {
+        	totalScoreX = score;
+    	}
+                         
     }
               
     public char[][] getPieces(){
@@ -81,74 +258,31 @@ public class Board {
         int targety = target[0];
         boolean doubleJump = false;
         
-        
         if (bpx < 0 || bpy < 0 || targetx < 0 || targety < 0 || bpx > 7 || bpy > 7 || targetx > 7 || targety > 7) {
             return false;
         }
         
-        //handling single moves of reg pieces
-        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'X') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        //handling single moves of reg pieces
-        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'x') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        //handling single moves of reg pieces
-        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O')  &&
-            (pieces[bpx][bpy] == 'X') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-                        
-        //handling single moves of reg pieces
-        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'x') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
         //handling jumps and takes of reg pieces
         if ((bpx + 2 == targetx) && (bpy - 2 == targety) && (pieces[targetx][targety] == 'O') &&
-            ((pieces[targetx-1][targety+1] == 'x') || (pieces[targetx-1][targety+1] == 'k')) &&
-            (pieces[bpx][bpy] == 'X') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[targetx-1][targety+1] = 'O';
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
-            if (doubleJump) {
-                if (turn == 'x'){
-                    turn = 'X';
-                }
-                else {
-                    turn = 'x';
-                }
-            }
-            return true;
+        	((pieces[targetx-1][targety+1] == 'x') || (pieces[targetx-1][targety+1] == 'k')) &&
+             (pieces[bpx][bpy] == 'X') && (turn == 'X')) {
+    		 char replace = pieces[bpx][bpy];
+             newPlacement(targetx, targety, replace);
+             pieces[targetx-1][targety+1] = 'O';
+             pieces[bpx][bpy] = 'O';
+             updateGame();
+             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+             if (doubleJump) {
+                 if (turn == 'x'){
+                     turn = 'X';
+                 }
+                 else {
+                     turn = 'x';
+                 }
+             }
+             
+             return true;
+         
         }
         
         //handling jumps and takes of reg pieces
@@ -159,7 +293,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -180,7 +314,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -201,7 +335,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -213,110 +347,7 @@ public class Board {
             }
             return true;
         }
-                        
-                        
-        //handling single moves of k pieces
-        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'k') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        //handling single moves of k pieces
-        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'k') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-                        
-        //handling single moves of k pieces
-        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O')  &&
-            (pieces[bpx][bpy] == 'k') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        //handling single moves of k pieces
-        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'k') && (turn == 'x')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-                        
-        //handling single moves of k pieces
-        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'K') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-                        
-                        
-        //handling single moves of k pieces
-        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'K') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        
-        //handling single moves of K pieces
-        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'K') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-                        
-        //handling single moves of k pieces
-        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
-            (pieces[targetx][targety] == 'O')  &&
-            (pieces[bpx][bpy] == 'K') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-        
-        //handling single moves of k pieces
-        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
-            (pieces[targetx][targety] == 'O') &&
-            (pieces[bpx][bpy] == 'K') && (turn == 'X')) {
-            char replace = pieces[bpx][bpy];
-            newPlacement(targetx, targety, replace);
-            pieces[bpx][bpy] = 'O';
-            updateScore();
-            return true;
-        }
-                                                    
+              
         //handling jumps and takes of king pieces
         if ((bpx + 2 == targetx) && (bpy - 2 == targety) && (pieces[targetx][targety] == 'O') &&
             ((pieces[targetx-1][targety+1] == 'x') || (pieces[targetx-1][targety+1] == 'k')) &&
@@ -325,7 +356,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -346,7 +377,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -367,7 +398,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -388,7 +419,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -410,7 +441,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -431,7 +462,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
                 if (doubleJump) {
                     if (turn == 'x'){
@@ -452,7 +483,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -473,7 +504,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
                 if (turn == 'x'){
@@ -485,14 +516,159 @@ public class Board {
             }
             return true;
         }
-                                
+        
+        //handling single moves of reg pieces
+        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'X') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        //handling single moves of reg pieces
+        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'x') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        //handling single moves of reg pieces
+        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O')  &&
+            ((pieces[bpx][bpy] == 'X') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+                        
+        //handling single moves of reg pieces
+        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'x') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true; 
+        }
+        
+        //handling single moves of k pieces
+        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'k') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        //handling single moves of k pieces
+        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'k') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+                        
+        //handling single moves of k pieces
+        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O')  &&
+            ((pieces[bpx][bpy] == 'k') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        //handling single moves of k pieces
+        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'k') && (turn == 'x')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+                        
+        //handling single moves of k pieces
+        if ((bpx - 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'K') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+                        
+                        
+        //handling single moves of k pieces
+        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'K') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        
+        //handling single moves of K pieces
+        if ((bpx - 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'K') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+                        
+        //handling single moves of k pieces
+        if ((bpx + 1 == targetx) && (bpy - 1 == targety) &&
+            (pieces[targetx][targety] == 'O')  &&
+            ((pieces[bpx][bpy] == 'K') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+        
+        //handling single moves of k pieces
+        if ((bpx + 1 == targetx) && (bpy + 1 == targety) &&
+            (pieces[targetx][targety] == 'O') &&
+            ((pieces[bpx][bpy] == 'K') && (turn == 'X')) && (mustCapture == false)) {
+            char replace = pieces[bpx][bpy];
+            newPlacement(targetx, targety, replace);
+            pieces[bpx][bpy] = 'O';
+            updateGame();
+            return true;
+        }
+                           
         return false;
     }
               
               
     public boolean attemptDouble(int bpx, int bpy, char current) {
-    	
-                    
+
                     
     try {
     	//handling doubles of big bois
@@ -503,7 +679,7 @@ public class Board {
             newPlacement(bpx-2, bpy+2, replace);
             pieces[bpx-1][bpy+1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
             return true;
         }
@@ -521,7 +697,7 @@ public class Board {
             newPlacement(bpx-2, bpy-2, replace);
             pieces[bpx-1][bpy-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
             return true;
         }
@@ -538,7 +714,7 @@ public class Board {
             newPlacement(bpx+2, bpy-2, replace);
             pieces[bpx+1][bpy-1] = 'O';
             pieces[bpx][bpy] = 'O';
-            updateScore();
+            updateGame();
             attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             return true;
         }
@@ -555,7 +731,7 @@ public class Board {
                 newPlacement(bpx+2, bpy+2, replace);
                 pieces[bpx+1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
-                updateScore();
+                updateGame();
                 attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
                 return true;
             }
@@ -572,7 +748,7 @@ public class Board {
                 newPlacement(bpx-2, bpy+2, replace);
                 pieces[bpx-1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
-                updateScore();
+                updateGame();
                 attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
                 return true;
             }
@@ -590,7 +766,7 @@ public class Board {
                 newPlacement(bpx-2, bpy-2, replace);
                 pieces[bpx-1][bpy-1] = 'O';
                 pieces[bpx][bpy] = 'O';
-                updateScore();
+                updateGame();
                 attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
                 return true;
             }
@@ -608,7 +784,7 @@ public class Board {
                 newPlacement(bpx+2, bpy-2, replace);
                 pieces[bpx+1][bpy-1] = 'O';
                 pieces[bpx][bpy] = 'O';
-                updateScore();
+                updateGame();
                 attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
                 return true;
         }
@@ -625,7 +801,7 @@ public class Board {
                 newPlacement(bpx+2, bpy+2, replace);
                 pieces[bpx+1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
-                updateScore();
+                updateGame();
                 attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
                 return true;
         }
@@ -653,61 +829,7 @@ public class Board {
     public int getWhiteScore() {
         return XVal;
     }
-    
-    public void updateScore() {
-        xVal = 0;
-        XVal = 0;
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (pieces[i][j] == 'x') {
-                    XVal+= 3;
-                }
-                if (pieces[i][j] == 'k') {
-                    XVal+= 5;
-                }
-                if (pieces[i][j] == 'X') {
-                    xVal+= 3;
-                }
-                if (pieces[i][j] == 'K') {
-                    xVal+= 5;
-                }
-            }
-        }
-        
-                         
-    }
-    
-    public int getScore(char player) {
-        xVal = 0;
-        XVal = 0;
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (pieces[i][j] == 'x') {
-                    XVal+= 3;
-                }
-                if (pieces[i][j] == 'k') {
-                    XVal+= 5;
-                }
-                if (pieces[i][j] == 'X') {
-                    xVal+= 3;
-                }
-                if (pieces[i][j] == 'K') {
-                    xVal+= 5;
-                }
-            }
-        }
-        
-        if (player == 'x') {
-        	return XVal - xVal;
-        }
-        
-        return xVal - XVal;
-                         
-    }
-          
-          
+               
     public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
                          
         ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
@@ -717,7 +839,7 @@ public class Board {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     if (pieces[i][j] == 'x') {
-                                        
+                        
                         pReturned.add(new ArrayList<>());
                         pReturned.get(pieceCounter).add(j);
                         pReturned.get(pieceCounter).add(i);
@@ -751,7 +873,7 @@ public class Board {
             }
         }
         
-    return pReturned;
+        return pReturned;
                         
     }
         

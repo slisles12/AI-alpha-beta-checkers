@@ -1,12 +1,19 @@
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+
 
 public class Player {
-	    
-	public Board computeWhitePlayer(Board board) {
+	
+	public Player(Board b) {
 
-
-		Board nextBoard = Minimax(board, 'x');
+	}
+	
+	public Board computeWhitePlayer(Board board) { 
+        
+		Board nextBoard = AlphaBeta(board, 'x');
 
 		
 		char[][] temp = nextBoard.getPieces();
@@ -19,8 +26,8 @@ public class Player {
 			}
 			System.out.println();
 		}
-		
-
+        System.out.println(nextBoard.getTotalScore('x'));
+        
 		return nextBoard;
 	}
 	
@@ -28,9 +35,9 @@ public class Player {
 	
 	public Board computeBluePlayer(Board board) {
 
-		Board nextBoard = Minimax(board, 'X');
+        
+		Board nextBoard = AlphaBeta(board, 'X');
 
-		
 		char[][] temp = nextBoard.getPieces();
 	 
 		System.out.println("\n\n\n");
@@ -44,56 +51,101 @@ public class Player {
 		
 
 		return nextBoard;
-		
-		
 	
 	}
 	
 	
-	public Board Minimax(Board board, char player) {
+	public Board AlphaBeta(Board board, char player) {
 		
-		System.out.println(board.getScore(player));
-		
-		 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(player);
+		 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
          
-		 ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-
-		 System.out.println(piecesPossible.size());
+		 HashMap<Integer, Board> nextBoards = new HashMap<Integer, Board>();                       
+		
 		 for (int i = 0; i < piecesPossible.size(); i++) {          
 		     if (board.nextBoards(piecesPossible.get(i))!= null) {
 		         for (Board b: board.nextBoards(piecesPossible.get(i))) {
-		        	 nextBoards.add(b);
+		        	 
+		        	 System.out.println(b.getTotalScore(player));
+		        	 
+		        	 nextBoards.put(MaxValue(b, 1, player, -1000, 1000), b);
+		        	 
 		         }
 		     }
 		 }
+
+		 Integer maxKey = Collections.max(nextBoards.keySet());
 		 
-
-		Board maxBoard = new Board(board);
-
-        
-		for (Board aBoard: nextBoards) {
-			if ((MinValue(aBoard, 1, player) >= maxBoard.getScore(player)) && !board.isEqual(aBoard)) {
-				maxBoard = aBoard;
+		 
+		 System.out.println(maxKey + "maxKey");
+		 
+		 char[][] temp =  nextBoards.get(maxKey).getPieces();
+	 
+		System.out.println("\n\n\n");
+		
+		for (int t = 0; t < 8; t++) {
+			for (int j = 0; j < 8; j++) {
+				System.out.print(" " + temp[j][t] + " ");
 			}
+			System.out.println();
 		}
 		
-		System.out.println(maxBoard.getScore(player));
-
-		return maxBoard;
+		 return nextBoards.get(maxKey);
 
 	}
 	
-	public int MaxValue(Board board, int depth, char player) {
+	public int MaxValue(Board board, int depth, char player, int alpha, int beta) {
 		
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
-			return board.getScore(player);
+		if (depth == 7 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {	
+			return board.getTotalScore(player);
 		}
 		else {
 
 			 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
 	         
 			 ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-			
+
+			 
+			 
+			 for (int i = 0; i < piecesPossible.size(); i++) {          
+			     if (board.nextBoards(piecesPossible.get(i))!= null) {
+			         for (Board b: board.nextBoards(piecesPossible.get(i))) {			 
+			        	 nextBoards.add(b);
+			         }
+			     }
+			 }
+			                         
+			int value = -1000; 
+			 
+			for (Board aBoard: nextBoards) {
+				int temp = MinValue(aBoard, depth+1, player, alpha, beta);
+				if (temp > value) {
+					value = temp;
+				}
+				
+				if (value >= beta) {
+					return value;
+				}
+				
+				if (value > alpha) {
+					alpha = value;
+				}
+			}
+			 
+			return value;
+
+		}
+	}
+	
+	public int MinValue(Board board, int depth, char player, int alpha, int beta) {
+
+		if (depth == 7 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
+			return board.getTotalScore(player);
+		}
+		else {
+			 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
+	         
+			 ArrayList<Board> nextBoards = new ArrayList<Board>();                       
+
 			 for (int i = 0; i < piecesPossible.size(); i++) {          
 			     if (board.nextBoards(piecesPossible.get(i))!= null) {
 			         for (Board b: board.nextBoards(piecesPossible.get(i))) {
@@ -101,53 +153,26 @@ public class Player {
 			         }
 			     }
 			 }
-			                          
-			
-			 Board maxBoard = new Board(board);
 
-			for (Board aBoard: nextBoards) {
-				if (MinValue(aBoard, depth+1, player) >= maxBoard.getScore(player)) {
-					maxBoard = aBoard;
-				}
-			}
-
-
-			return maxBoard.getScore(player);
-		}
-	}
-	
-	public int MinValue(Board board, int depth, char player) {
-
-		
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
-			return board.getScore(player);
-		}
-		
-		else {
-			 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
-	         
-			 ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-			
+			 int value = 1000;
 			 
-			 
-			 for (int i = 0; i < piecesPossible.size(); i++) {          
-			     if (board.nextBoards(piecesPossible.get(i))!= null) {
-			         for (Board b: board.nextBoards(piecesPossible.get(i))) {
-			        	 nextBoards.add(b);
-			         }
-			     }
-			 }
-
-			 Board minBoard = new Board(board);
-
-			for (Board aBoard: nextBoards) {
-				if (MaxValue(aBoard, depth+1, player) <= minBoard.getScore(player)) {
-					minBoard = aBoard;
+			 for (Board aBoard: nextBoards) {
+					int temp = MaxValue(aBoard, depth+1, player, alpha, beta);
+					
+					if (temp < value) {
+						value = temp;
+					}
+					
+					if (value <= alpha) {
+						return value;
+					}
+					
+					if (value < beta) {
+						beta = value;
+					}
 				}
-			}
-
-
-			return minBoard.getScore(player);
+			
+				return value;
 		}
 	}
 
