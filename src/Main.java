@@ -32,43 +32,59 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
+
 public class Main extends Application {
-              
+    static int height = 600; //height of GUI
+    static int width = 600; //width of GUI
+    static int[] buttonPressed = new int[2]; //array of button pressed
+    static boolean playerBlue = false; //human or AI player
+    static boolean playerWhite = false; //human or AI player
+    static boolean readyPlay = false; //variable to init AI v AI mode
+    static Board board; //current board
+    static Player players; //players class for AI
 
-    static int height = 600;
-    static int width = 600;
-    static int[] buttonPressed = new int[2];
-    static boolean playerBlue = false;
-    static boolean playerWhite = false;
-    static boolean readyPlay = false;
-    static Board board;
-    static Player players;
-
+    /**
+     * Start of program
+     */
     public static void main(String[] args) {
      launch(args);
     }
 
 
+	/**
+	 * Try to place a piece in the grid, and then return the new board if it's successful
+	 * 
+	 * @param primaryStage is the stage being passed
+	 * @return void
+	 */
     @Override
     public void start(Stage primaryStage) {
 
+    //start of GUI
     try {
+    	//create player and board
     	players = new Player(board);
-
     	board = new Board();
+    	
+    	//set title
         primaryStage.setTitle("Starting Screen");
 
+        //set labels 
         Label label = new Label("Checkers!");
         label.setFont(new Font("Arial", 60));
         label.setLayoutX(80);
 
+        //buttons for modes
         Button button1 = new Button("Human vs Human");
         Button button2 = new Button("Human vs AI");
         Button button3 = new Button("AI vs AI");
+        
+        //button font
         button1.setStyle("-fx-font-size:20;");
         button2.setStyle("-fx-font-size:20;");
         button3.setStyle("-fx-font-size:20;");
         
+        //button height and width
         button1.setPrefHeight(40);
         button1.setPrefWidth(220);
         button2.setPrefHeight(40);
@@ -77,7 +93,7 @@ public class Main extends Application {
         button3.setPrefWidth(220);
 
 
-        Pane root = new Pane();
+        //set position on screen
         button1.setLayoutX(140);
         button1.setLayoutY(200);
         button2.setLayoutX(140);
@@ -85,153 +101,182 @@ public class Main extends Application {
         button3.setLayoutX(140);
         button3.setLayoutY(300);
 
-
+        //root pane to add onto
+        Pane root = new Pane();
+        
+        //adding buttons
         root.getChildren().add(button1);
         root.getChildren().add(button2);
         root.getChildren().add(button3);
         root.getChildren().add(label);
 
+        //human v human mode inited when button is pressed
         button1.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
+            @Override public void handle(ActionEvent e) {           	
+            	//humans are both blue and white
 	            playerBlue = true;
 	            playerWhite = true;
-	            updateBoard(primaryStage, board);
+	            
+	            //calling method to run human v human mode
+	            updateBoard(primaryStage);
             }
         });
 
+        //human v AI mode inited when button is pressed
         button2.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
+            	//human is blue and AI is white
 	            playerBlue = true;
 	            playerWhite = false;
-	            updateBoard(primaryStage, board);
+	            
+	            //calling method to run human v human mode
+	            updateBoard(primaryStage);
             }
         });
         
-        
-
+   
+        //AI v AI mode inited when button is pressed
         button3.setOnAction((EventHandler<ActionEvent>) new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
+            	//AI is blue and AI is white
 	            playerBlue = false;
 	            playerWhite = false;
+	            
+	            //variable to allow animation to take place
 	            readyPlay = true;
             }
         });
 
+        //create scene and add root
         Scene scene = new Scene(root,500,500);
-
+        
+        //set scene to primary stage
         primaryStage.setScene(scene);
+        
+        //show the stage
         primaryStage.show();
 
 
+        //animation for AI v AI mode
         new AnimationTimer() {
             @Override
             public void handle(long now) {
+            	
+            	 //if we are in AI v AI mode
             	 if (readyPlay == true) {
-            		 
 
-        			char[][] temp = board.getPieces();
-        		 
-        			System.out.println("\n\n\n");
-        			
-        			for (int t = 0; t < 8; t++) {
-        				for (int j = 0; j < 8; j++) {
-        					System.out.print(" " + temp[j][t] + " ");
-        				}
-        				System.out.println();
-        			}
+            		 //set title
+                	 primaryStage.setTitle("Game is being played");
 
-                	 primaryStage.setTitle("Starting Screen");
-
+                	 //make new grid for buttons
                      GridPane grid = new GridPane();
                      
-                     buttonPressed[0] = -1;
-                     buttonPressed[1] = -1;
-                     
-                     
+                     //getting raw score of boards
                      int blueScore = board.getBlueScore();
                      int whiteScore = board.getWhiteScore();
 
+                     
+                     //seeing all the next possible moves
                      ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
-
              		 ArrayList<Board> nextBoards = new ArrayList<Board>();    
              		 
-             		 for (int i = 0; i < piecesPossible.size(); i++) {          
+             		 //if we have pieces to move
+             		 for (int i = 0; i < piecesPossible.size(); i++) {  
+             			 //if we can make moves for those pieces
              		     if (board.nextBoards(piecesPossible.get(i))!= null) {
+             		    	 //for each move we can make
              		         for (Board b: board.nextBoards(piecesPossible.get(i))) {		
-             		        	 
+             		        	 //add to nextBoards
              		        	 nextBoards.add(b);
-             		        	 
              		         }
              		     }
              		 }	 
              		 
-             	if (blueScore == 0 || whiteScore == 0 || nextBoards.size() == 0) {
+
+             		 //if the game has ended
+             		 if (blueScore == 0 || whiteScore == 0 || nextBoards.size() == 0) {
              			
-        	            primaryStage.setTitle("Ending Screen");
-        	
-        	            Label label;
-        	            if (blueScore < whiteScore) {
-        		            label = new Label("END OF GAME! \n\n" + "White wins!");
-        	            }
-        	            else {
-        		            label = new Label("END OF GAME! \n\n" + "Blue wins!");
-        	            }
-        	            
-        	            label.setFont(new Font("Arial", 50));
-        	            label.setLayoutX(80);
+            			 //title is end game
+            			 primaryStage.setTitle("End Of Game");
 
-                        System.out.println("END OF GAME");
-                        
-                        Pane root = new Pane();
-                        
-                        root.getChildren().add(label);
-                        
-                        Scene scene = new Scene(root,500,500);
+            			 Label label;
+            			 
+            			 //if loss was because of score
+            			 if (blueScore == 0 || whiteScore == 0) {
+            				 //white has greater score so white wins
+            				 if (blueScore < whiteScore) {
+                				 label = new Label("END OF GAME! \n\n" + "White wins!");
+                			 }
+            				 //blue has greater score so blue wins
+                			 else {
+                				 System.out.println("hey");
+                				 label = new Label("END OF GAME! \n\n" + "Blue wins!");
+                			 }
+            			 }
+            			 //if loss was because of lack of moves
+            			 else {
+            				 //white wins because blue can't move
+            				 if (board.getTurn() == 'X') {
+            					 label = new Label("END OF GAME! \n\n" + "White wins!");
+            				 }
+            				 //blue wins because white can't move
+            				 else {
+            					 System.out.println("hey");
+            					 label = new Label("END OF GAME! \n\n" + "Blue wins!");
+            				 }
+            			 }
+            			 
+             			 //setting style of label
+             			 label.setFont(new Font("Arial", 50));
+             			 label.setLayoutX(80);
 
-                        primaryStage.setScene(scene);
-                        primaryStage.show();
+             			 //make root
+             			 Pane root = new Pane();
+             			 
+             			 //add label
+             			 root.getChildren().add(label);
+                        
+             			 //add root to scene
+             			 Scene scene = new Scene(root,500,500);
 
-             		}
+             			 //set scene on stage
+             			 primaryStage.setScene(scene);
+             			 primaryStage.show();
+
+             		 }
              		
+             		 //if game is not over
              		 else {
-                         
+             			 
+             			 //for every piece
                          for (int i = 0; i < 8; i++) {
-                             
                              for (int j = 0; j < 8; j++) {
 
                                  //Creating a rectangle object         
                                  Rectangle rectangle = new Rectangle();
-                                         
+                                        
+                                 //set rectangle
                                  rectangle.setHeight(height/8);
                                  rectangle.setWidth(width/8);
-                                     
+                                    
+                                 //add to the grid
                                  GridPane.setRowIndex(rectangle, j);
                                  GridPane.setColumnIndex(rectangle, i);
                                  
 
+                                 //if i,j mod 2 are 0 then make it red
                                  if (i % 2 == 0 && j % 2 == 0) {
                                      rectangle.setFill(Color.RED);
                                  }
+                                 // if both i and j mod 2 is not 0 make it red 
                                  else if (i % 2 != 0 && j % 2 != 0) {
                                      rectangle.setFill(Color.RED);
                                  }
+                                 //else make it black
                                  else {
                                      rectangle.setFill(Color.BLACK);
                                  }
-                                 
-                                 rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-                                 	@Override
-                                 	public void handle(MouseEvent event) {
-                                         if (buttonPressed[0] != -1 && buttonPressed[1] != -1) {
-                                             int[] target = new int[2];
-                                             target[0] = GridPane.getRowIndex(rectangle);
-                                             target[1] = GridPane.getColumnIndex(rectangle);
-                                             board.doSwap(target, buttonPressed);
-                                         }
-                                     }
-                                 });
-                                                     
                                  grid.getChildren().add(rectangle);
 
                              }
@@ -241,104 +286,74 @@ public class Main extends Application {
                                      
                          for (int i = 0; i < 8; i++) {
                              for (int j = 0; j < 8; j++) {
-                                         
+                            	 //if we have a blue king
                                  if (board.getPiece(i, j) == 'K') {
-                     
+                                	 //make new button for king
                                      Button bt = new Button("K");
                                      bt.setShape(new Circle(width/8));
                                      bt.setPrefSize(80, 65);
                                      bt.setStyle("-fx-background-color: Blue;" +  "-fx-font-size:25;");
-                                         
-                                     if (playerBlue == true && board.getTurn() == 'X') {
-             	                        bt.setOnAction(new EventHandler<ActionEvent>() {
-             	                            @Override public void handle(ActionEvent e) {         
-             	                                buttonPressed[0] = GridPane.getRowIndex(bt);
-             	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
-             	                            }
-             	                        });
-                                     }
-             	                            
+                                     
+                                     //add to the grid
                                      grid.add(bt, i, j);
                                  }
-                                                         
+                                 //if we have a white king                        
                                  if (board.getPiece(i, j) == 'k') {
+                                	 //make new button for king
                                      Button bt = new Button("K");
                                      bt.setShape(new Circle(width/8));
                                      bt.setPrefSize(80, 65);
                                      bt.setStyle("-fx-background-color: White;" + "-fx-font-size:25;");
                                      
-                                 if (playerWhite == true && board.getTurn() == 'x') {
-                                     bt.setOnAction(new EventHandler<ActionEvent>() {
-                                             @Override public void handle(ActionEvent e) {
-                                                 buttonPressed[0] = GridPane.getRowIndex(bt);
-                                                 buttonPressed[1] = GridPane.getColumnIndex(bt);
-                                             
-                                             }
-                                         });
-                                     }
-                                     
+                                     //add to the grid
                                      grid.add(bt, i, j);
                                  }
+                                 //if we have a blue piece
                                  if (board.getPiece(i, j) == 'X') {
-              
+                                	 //make a blue button
                                      Button bt = new Button();
                                      bt.setShape(new Circle(width/8));
                                      bt.setPrefSize(80, 65);
                                      bt.setStyle("-fx-background-color: Blue");
-                                     
-                                     if (playerBlue == true && board.getTurn() == 'X') {
-             	                        bt.setOnAction(new EventHandler<ActionEvent>() {
-             	                            @Override public void handle(ActionEvent e) {
-             	                                        
-             	                                buttonPressed[0] = GridPane.getRowIndex(bt);
-             	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
-             	
-             	                            }
-             	                        });
-                                     }
-                                     
+
+                                     //add to the grid
                                      grid.add(bt, i, j);
                                                                          
                                  }
+                                 //if we have a white piece
                                  if (board.getPiece(i, j) == 'x') {
-                                                                         
+                                	 //make a white button
                                      Button bt = new Button();
                                      bt.setShape(new Circle(width/8));
                                      bt.setPrefSize(80, 65);
                                      bt.setStyle("-fx-background-color: White");
                                      
-                                     if (playerWhite == true && board.getTurn() == 'x') {
-                                         bt.setOnAction(new EventHandler<ActionEvent>() {
-                                             @Override public void handle(ActionEvent e) {
-                                                         
-                                                 buttonPressed[0] = GridPane.getRowIndex(bt);
-                                                 buttonPressed[1] = GridPane.getColumnIndex(bt);
-                     
-                                             }
-                                         });
-                                     }
-
+                                     //add to the grid
                                      grid.add(bt, i, j);
                                          
                                  }
                              }
                          }
 
-                         System.out.println("showing scene");
-                         
+                         //add grid to the scene
                          primaryStage.setScene(new Scene(grid,height,width));
 
+                         //show the scene
                          primaryStage.show();
                          
-                         if (playerWhite == false && board.getTurn() == 'x') {
-                             board = players.computeWhitePlayer(board);
+                         //if it is white turn
+                         if (board.getTurn() == 'x') {
+                        	 //do white move 
+                             board = players.AlphaBeta(board, 'x');
                          } 
-                         else if (playerBlue == false && board.getTurn() == 'X') {
-                             board = players.computeBluePlayer(board);
+                         //if it is blue turn
+                         else if (board.getTurn() == 'X') {
+                        	 //do blue move
+                             board =  players.AlphaBeta(board, 'X');
                              
                          }
                         
-                         
+                         //sleepy boi to make it look like the game doesn't just end at low depths
                          try {
                          	Thread.sleep(200);
                          } catch (InterruptedException e) {
@@ -349,203 +364,287 @@ public class Main extends Application {
                 }
             }
 				 
-        }.start();
+        }.start(); //start the animation
 
-
+        //catch any GUI exceptions
         } catch(Exception e) {
                     e.printStackTrace();
         }
 
     }
     
-    public static void updateBoard(Stage primaryStage, Board board) {
 
+	/**
+	 * Try to place a piece in the grid, and then return the new board if it's successful
+	 * 
+	 * @param primaryStage is the stage being passed
+	 * @return void
+	 */
+    public static void updateBoard(Stage primaryStage) {
+
+    	//final for action handlers
     	final Board otherBoard = board;
     	
+    	//set title
         primaryStage.setTitle("Starting Screen");
-        
-        char[][] temp = board.getPieces();
 
+        //make grid
         GridPane grid = new GridPane();
         
+        //checking if the human pressed a button
         buttonPressed[0] = -1;
         buttonPressed[1] = -1;
         
-        
+        //getting raw score of boards
         int blueScore = board.getBlueScore();
         int whiteScore = board.getWhiteScore();
+
+        
+        //seeing all the next possible moves
+        ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
+		 ArrayList<Board> nextBoards = new ArrayList<Board>();    
+		 
+		 //if we have pieces to move
+		 for (int i = 0; i < piecesPossible.size(); i++) {  
+			 //if we can make moves for those pieces
+		     if (board.nextBoards(piecesPossible.get(i))!= null) {
+		    	 //for each move we can make
+		         for (Board b: board.nextBoards(piecesPossible.get(i))) {		
+		        	 //add to nextBoards
+		        	 nextBoards.add(b);
+		         }
+		     }
+		 }	 
+		 
         
         
-        if (blueScore == 0 || whiteScore == 0 || board.getPiecesLeft('X').size() == 0 || board.getPiecesLeft('x').size() == 0) {
-	            primaryStage.setTitle("Ending Screen");
-	
-	            Label label;
-	            if (blueScore < whiteScore) {
-		            label = new Label("END OF GAME! \n\n" + "White wins!");
-	            }
-	            else {
-		            label = new Label("END OF GAME! \n\n" + "Blue wins!");
-	            }
-	            
-	            label.setFont(new Font("Arial", 50));
-	            label.setLayoutX(80);
+ 		 //if the game has ended
+		 if (blueScore == 0 || whiteScore == 0 || nextBoards.size() == 0) {
+			
+			 //title is end game
+			 primaryStage.setTitle("End Of Game");
 
-                System.out.println("END OF GAME");
-                
-                Pane root = new Pane();
-                
-                root.getChildren().add(label);
-                
-                Scene scene = new Scene(root,500,500);
+			 Label label;
+			 
+			 //if loss was because of score
+			 if (blueScore == 0 || whiteScore == 0) {
+				 //white has greater score so white wins
+				 if (blueScore < whiteScore) {
+    				 label = new Label("END OF GAME! \n\n" + "White wins!");
+    			 }
+				 //blue has greater score so blue wins
+    			 else {
+    				 System.out.println("hey");
+    				 label = new Label("END OF GAME! \n\n" + "Blue wins!");
+    			 }
+			 }
+			 //if loss was because of lack of moves
+			 else {
+				 //white wins because blue can't move
+				 if (board.getTurn() == 'X') {
+					 label = new Label("END OF GAME! \n\n" + "White wins!");
+				 }
+				 //blue wins because white can't move
+				 else {
+					 System.out.println("hey");
+					 label = new Label("END OF GAME! \n\n" + "Blue wins!");
+				 }
+			 }
+		
+          
+			 //setting style of label
+			 label.setFont(new Font("Arial", 50));
+			 label.setLayoutX(80);
 
-                primaryStage.setScene(scene);
-                primaryStage.show(); 
+			 //make root
+			 Pane root = new Pane();
+			 
+			 //add label
+			 root.getChildren().add(label);
+           
+			 //add root to scene
+			 Scene scene = new Scene(root,500,500);
 
-        }
-        else{
+			 //set scene on stage
+			 primaryStage.setScene(scene);
+			 primaryStage.show();
+
+		 }
+		 else{
+             
+			 //for each piece on the board
+			 for (int i = 0; i < 8; i++) {
+				 for (int j = 0; j < 8; j++) {
+
+					 //Creating a rectangle object         
+					 Rectangle rectangle = new Rectangle();
+
+                     //set rectangle
+                     rectangle.setHeight(height/8);
+                     rectangle.setWidth(width/8);
+                        
+                     //add to the grid
+                     GridPane.setRowIndex(rectangle, j);
+                     GridPane.setColumnIndex(rectangle, i);
+                     
+
+                     //if i,j mod 2 are 0 then make it red
+                     if (i % 2 == 0 && j % 2 == 0) {
+                         rectangle.setFill(Color.RED);
+                     }
+                     // if both i and j mod 2 is not 0 make it red 
+                     else if (i % 2 != 0 && j % 2 != 0) {
+                         rectangle.setFill(Color.RED);
+                     }
+                     //else make it black
+                     else {
+                         rectangle.setFill(Color.BLACK);
+                     }
+
+
+                     //set action 
+					 rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+						 @Override
+						 public void handle(MouseEvent event) {
+							 //if the button has been pressed
+							 if (buttonPressed[0] != -1 && buttonPressed[1] != -1) {
+								 //array to send
+								 int[] target = new int[2];
+								 
+								 //add values to array
+								 target[0] = GridPane.getRowIndex(rectangle);
+								 target[1] = GridPane.getColumnIndex(rectangle);
+								 
+								 //attempt swap
+								 if (otherBoard.doSwap(target, buttonPressed)) {
+									 //update board
+									 updateBoard(primaryStage);
+								 }
+							 }
+						 }
+					 });
                                     
-            for (int i = 0; i < 8; i++) {
-                
-                for (int j = 0; j < 8; j++) {
+					 //add rectangle
+					 grid.getChildren().add(rectangle);
 
-                    //Creating a rectangle object         
-                    Rectangle rectangle = new Rectangle();
-                            
-                    rectangle.setHeight(height/8);
-                    rectangle.setWidth(width/8);
-                        
-                    GridPane.setRowIndex(rectangle, j);
-                    GridPane.setColumnIndex(rectangle, i);
+				 }
+                                
+                                
+			 }
                     
-
-                    if (i % 2 == 0 && j % 2 == 0) {
-                        rectangle.setFill(Color.RED);
-                    }
-                    else if (i % 2 != 0 && j % 2 != 0) {
-                        rectangle.setFill(Color.RED);
-                    }
-                    else {
-                        rectangle.setFill(Color.BLACK);
-                    }
-                    
-                    rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                    	@Override
-                    	public void handle(MouseEvent event) {
-                            if (buttonPressed[0] != -1 && buttonPressed[1] != -1) {
-                                int[] target = new int[2];
-                                target[0] = GridPane.getRowIndex(rectangle);
-                                target[1] = GridPane.getColumnIndex(rectangle);
-                                if (otherBoard.doSwap(target, buttonPressed)) {
-                                    updateBoard(primaryStage, otherBoard);
-                                }
-                            }
-                        }
-                    });
-                                        
-                    grid.getChildren().add(rectangle);
-
-                }
-                                
-                                
-            }
+			 //for each piece
+			 for (int i = 0; i < 8; i++) {
+				 for (int j = 0; j < 8; j++) {
                         
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
+					 //if piece is a blue king
+					 if (board.getPiece(i, j) == 'K') {
+						 //make new button for king
+						 Button bt = new Button("K");
+						 bt.setShape(new Circle(width/8));
+						 bt.setPrefSize(80, 65);
+						 bt.setStyle("-fx-background-color: Blue;" +  "-fx-font-size:25;");
                             
-                    if (board.getPiece(i, j) == 'K') {
-        
-                        Button bt = new Button("K");
-                        bt.setShape(new Circle(width/8));
-                        bt.setPrefSize(80, 65);
-                        bt.setStyle("-fx-background-color: Blue;" +  "-fx-font-size:25;");
-                            
-                        if (playerBlue == true && board.getTurn() == 'X') {
-	                        bt.setOnAction(new EventHandler<ActionEvent>() {
-	                            @Override public void handle(ActionEvent e) {         
-	                                buttonPressed[0] = GridPane.getRowIndex(bt);
-	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
-	                            }
-	                        });
-                        }
-	                            
-                        grid.add(bt, i, j);
-                    }
-                                            
-                    if (board.getPiece(i, j) == 'k') {
-                        Button bt = new Button("K");
-                        bt.setShape(new Circle(width/8));
-                        bt.setPrefSize(80, 65);
-                        bt.setStyle("-fx-background-color: White;" + "-fx-font-size:25;");
+						 //if it is blue's turn and blue is human
+						 if (playerBlue == true && board.getTurn() == 'X') {
+							 bt.setOnAction(new EventHandler<ActionEvent>() {
+								 @Override public void handle(ActionEvent e) { 
+									 //set button pressed to be the values in the gridPane
+									 buttonPressed[0] = GridPane.getRowIndex(bt);
+									 buttonPressed[1] = GridPane.getColumnIndex(bt);
+								 }
+							 });
+						 }
+	                         
+						 //add to the grid
+						 grid.add(bt, i, j);
+					 } 
+					 //if we have a white king
+					 if (board.getPiece(i, j) == 'k') {
+						 //make button for king
+						 Button bt = new Button("K");
+						 bt.setShape(new Circle(width/8));
+						 bt.setPrefSize(80, 65);
+						 bt.setStyle("-fx-background-color: White;" + "-fx-font-size:25;");
                         
-                    if (playerWhite == true && board.getTurn() == 'x') {
-                        bt.setOnAction(new EventHandler<ActionEvent>() {
-                                @Override public void handle(ActionEvent e) {
-                                    buttonPressed[0] = GridPane.getRowIndex(bt);
-                                    buttonPressed[1] = GridPane.getColumnIndex(bt);
+						 //if it is white's turn and white is human
+						 if (playerWhite == true && board.getTurn() == 'x') {
+							 bt.setOnAction(new EventHandler<ActionEvent>() {
+								 @Override public void handle(ActionEvent e) {
+									 //set values of button pressed
+									 buttonPressed[0] = GridPane.getRowIndex(bt);
+									 buttonPressed[1] = GridPane.getColumnIndex(bt);
                                 
-                                }
-                            });
-                        }
+								 }
+							 });
+						 }
                         
-                        grid.add(bt, i, j);
-                    }
-                    if (board.getPiece(i, j) == 'X') {
- 
-                        Button bt = new Button();
-                        bt.setShape(new Circle(width/8));
-                        bt.setPrefSize(80, 65);
-                        bt.setStyle("-fx-background-color: Blue");
+						 //add button to grid
+						 grid.add(bt, i, j);
+					 }
+					 //if piece is blue
+					 if (board.getPiece(i, j) == 'X') {
+						 //create button for blue piece
+						 Button bt = new Button();
+						 bt.setShape(new Circle(width/8));
+						 bt.setPrefSize(80, 65);
+						 bt.setStyle("-fx-background-color: Blue");
                         
-                        if (playerBlue == true && board.getTurn() == 'X') {
-	                        bt.setOnAction(new EventHandler<ActionEvent>() {
-	                            @Override public void handle(ActionEvent e) {
-	                                        
-	                                buttonPressed[0] = GridPane.getRowIndex(bt);
-	                                buttonPressed[1] = GridPane.getColumnIndex(bt);
+						 //if blue's turn and blue is human
+						 if (playerBlue == true && board.getTurn() == 'X') {
+							 bt.setOnAction(new EventHandler<ActionEvent>() {
+								 @Override public void handle(ActionEvent e) {
+									 //set values for button pressed
+									 buttonPressed[0] = GridPane.getRowIndex(bt);
+									 buttonPressed[1] = GridPane.getColumnIndex(bt);
 	
-	                            }
-	                        });
-                        }
+								 }
+							 });
+						 }
+						 
+						 //add button to grid
+						 grid.add(bt, i, j);                          
+					 }
+					 //if white piece
+					 if (board.getPiece(i, j) == 'x') {
+						 //create white button
+						 Button bt = new Button();
+						 bt.setShape(new Circle(width/8));
+						 bt.setPrefSize(80, 65);
+						 bt.setStyle("-fx-background-color: White");
                         
-                        grid.add(bt, i, j);
-                                                            
-                    }
-                    if (board.getPiece(i, j) == 'x') {
-                                                            
-                        Button bt = new Button();
-                        bt.setShape(new Circle(width/8));
-                        bt.setPrefSize(80, 65);
-                        bt.setStyle("-fx-background-color: White");
-                        
-                        if (playerWhite == true && board.getTurn() == 'x') {
-                            bt.setOnAction(new EventHandler<ActionEvent>() {
-                                @Override public void handle(ActionEvent e) {
-                                            
-                                    buttonPressed[0] = GridPane.getRowIndex(bt);
-                                    buttonPressed[1] = GridPane.getColumnIndex(bt);
+						 //if white's turn and white is human
+						 if (playerWhite == true && board.getTurn() == 'x') {
+							 bt.setOnAction(new EventHandler<ActionEvent>() {
+								 @Override public void handle(ActionEvent e) {
+                                     //set button pressed values
+									 buttonPressed[0] = GridPane.getRowIndex(bt);
+									 buttonPressed[1] = GridPane.getColumnIndex(bt);
         
-                                }
-                            });
-                        }
+								 }
+							 });
+						 }
 
-                        grid.add(bt, i, j);
+						 //add button to grid
+						 grid.add(bt, i, j);
                             
-                    }
-                }
-            }
+					 }
+				 }
+			 }
             
-        	
+        	//add grid to scene
             Scene scene = new Scene(grid,height,width);
-            System.out.println("showing scene");
+            
+            //set and show scene
             primaryStage.setScene(scene);
             primaryStage.show();
             
-
+            //if white is AI and is white's turn
             if (playerWhite == false && board.getTurn() == 'x') {
-                board = players.computeWhitePlayer(board);
-                
-                updateBoard(primaryStage, board);
+            	//do the next board
+                board = players.AlphaBeta(board, 'x');
+                //update the board
+                updateBoard(primaryStage);
                 
             } 
                                            
