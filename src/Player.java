@@ -14,42 +14,14 @@ public class Player {
 	public Board computeWhitePlayer(Board board) { 
         
 		Board nextBoard = AlphaBeta(board, 'x');
-
-		
-		char[][] temp = nextBoard.getPieces();
-	 
-		System.out.println("\n\n\n");
-		
-		for (int t = 0; t < 8; t++) {
-			for (int j = 0; j < 8; j++) {
-				System.out.print(" " + temp[j][t] + " ");
-			}
-			System.out.println();
-		}
-        System.out.println(nextBoard.getTotalScore('x'));
-        
 		return nextBoard;
 	}
 	
 	
 	
 	public Board computeBluePlayer(Board board) {
-
         
 		Board nextBoard = AlphaBeta(board, 'X');
-
-		char[][] temp = nextBoard.getPieces();
-	 
-		System.out.println("\n\n\n");
-		
-		for (int t = 0; t < 8; t++) {
-			for (int j = 0; j < 8; j++) {
-				System.out.print(" " + temp[j][t] + " ");
-			}
-			System.out.println();
-		}
-		
-
 		return nextBoard;
 	
 	}
@@ -59,24 +31,26 @@ public class Player {
 		
 		 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
          
-		 HashMap<Integer, Board> nextBoards = new HashMap<Integer, Board>();                       
+		 HashMap<Double, Board> nextBoards = new HashMap<Double, Board>();                       
 		
 		 for (int i = 0; i < piecesPossible.size(); i++) {          
 		     if (board.nextBoards(piecesPossible.get(i))!= null) {
 		         for (Board b: board.nextBoards(piecesPossible.get(i))) {
 		        	 
-		        	 System.out.println(b.getTotalScore(player));
+		        	 double value = MaxValue(b, 1, player, -1000.0, 1000.0);
 		        	 
-		        	 nextBoards.put(MaxValue(b, 1, player, -1000, 1000), b);
+		        	 System.out.println("value chosen: " + value);
+		        	 
+		        	 nextBoards.put(value, b);
 		        	 
 		         }
 		     }
 		 }
 
-		 Integer maxKey = Collections.max(nextBoards.keySet());
+		 Double maxKey = Collections.max(nextBoards.keySet());
 		 
 		 
-		 System.out.println(maxKey + "maxKey");
+		 System.out.println(maxKey + ": maxKey");
 		 
 		 char[][] temp =  nextBoards.get(maxKey).getPieces();
 	 
@@ -93,9 +67,9 @@ public class Player {
 
 	}
 	
-	public int MaxValue(Board board, int depth, char player, int alpha, int beta) {
+	public double MaxValue(Board board, int depth, char player, Double alpha, Double beta) {
 		
-		if (depth == 7 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {	
+		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {	
 			return board.getTotalScore(player);
 		}
 		else {
@@ -114,10 +88,10 @@ public class Player {
 			     }
 			 }
 			                         
-			int value = -1000; 
+			Double value = (double) -1000; 
 			 
 			for (Board aBoard: nextBoards) {
-				int temp = MinValue(aBoard, depth+1, player, alpha, beta);
+				Double temp = MinValue(aBoard, depth+1, player, alpha, beta);
 				if (temp > value) {
 					value = temp;
 				}
@@ -136,10 +110,11 @@ public class Player {
 		}
 	}
 	
-	public int MinValue(Board board, int depth, char player, int alpha, int beta) {
+	public double MinValue(Board board, int depth, char player, Double alpha, Double beta) {
 
-		if (depth == 7 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
+		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {		
 			return board.getTotalScore(player);
+			
 		}
 		else {
 			 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft(board.getTurn());
@@ -154,10 +129,10 @@ public class Player {
 			     }
 			 }
 
-			 int value = 1000;
+			 Double value = (double) 1000;
 			 
 			 for (Board aBoard: nextBoards) {
-					int temp = MaxValue(aBoard, depth+1, player, alpha, beta);
+					Double temp = MaxValue(aBoard, depth+1, player, alpha, beta);
 					
 					if (temp < value) {
 						value = temp;
@@ -175,52 +150,4 @@ public class Player {
 				return value;
 		}
 	}
-
-	
-	
-	
-	
-	
-	
-	/*GREEDY VERSION FOR TESTING
-	public Board computeWhitePlayer(Board board) {
-	
-	 ArrayList<ArrayList<Integer>> piecesPossible = board.getPiecesLeft('x');
-	             
-	 ArrayList<Board> nextBoards = new ArrayList<Board>();                       
-	
-	 for (int i = 0; i < piecesPossible.size(); i++) {          
-	     if (board.nextBoards(piecesPossible.get(i))!= null) {
-	         for (Board b: board.nextBoards(piecesPossible.get(i))) {
-	        	 nextBoards.add(b);
-	         }
-	     }
-	 }
-	                          
-	
-	 Board highestBoard = new Board(board);
-	 	
-	 if (nextBoards.size() != 0) {
-	     Random rand = new Random();
-	
-	     highestBoard = nextBoards.get(rand.nextInt(nextBoards.size()));
-	
-	     for (int i = 0; i < nextBoards.size(); i++) {
-	         if (highestBoard.getBlueScore() > nextBoards.get(i).getBlueScore()) {
-	             highestBoard = nextBoards.get(i);
-	         }
-	     }
-	
-	
-	     board = new Board(highestBoard);
-	     return board;
-	     
-	 }
-	 else {
-	     System.out.println("ERORRRRRRR WHITE");
-	     return board;
-	 }
-	
-	
-	}*/
 }

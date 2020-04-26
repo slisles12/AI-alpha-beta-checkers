@@ -127,6 +127,8 @@ public class Main extends Application {
             @Override
             public void handle(long now) {
             	 if (readyPlay == true) {
+            		 
+
         			char[][] temp = board.getPieces();
         		 
         			System.out.println("\n\n\n");
@@ -324,8 +326,6 @@ public class Main extends Application {
 
                          System.out.println("showing scene");
                          
-                         System.out.println(grid.getChildren());
-                         
                          primaryStage.setScene(new Scene(grid,height,width));
 
                          primaryStage.show();
@@ -340,7 +340,7 @@ public class Main extends Application {
                         
                          
                          try {
-                         	Thread.sleep(50);
+                         	Thread.sleep(200);
                          } catch (InterruptedException e) {
                          	e.printStackTrace();
                          }
@@ -544,7 +544,9 @@ public class Main extends Application {
 
             if (playerWhite == false && board.getTurn() == 'x') {
                 board = players.computeWhitePlayer(board);
+                
                 updateBoard(primaryStage, board);
+                
             } 
                                            
         }

@@ -12,17 +12,24 @@ public class Board {
     private char turn;
     private int xVal;
     private int XVal;
-    private int totalScorex;
-    private int totalScoreX;
-    boolean mustCapture = false;
+    private double totalScorex;
+    private double totalScoreX;
+    private boolean mustCapture = false;
+    private boolean isK = false;
+    private boolean isk = false;
+    private int pieceChanged;
+    private Queue<Board> previousBoards;
 
     public Board() {
 
         this.pieces = new char[8][8];
-        
+        isK = false;
+        isk = false;
+        previousBoards = new LinkedList<Board>();
+        pieceChanged = 0;
         turn = 'X';
-        xVal = 12;
-        XVal = 12;
+        xVal = 0;
+        XVal = 0;
         
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -47,14 +54,19 @@ public class Board {
             }
         }
         
-        
-        
-
         updateGame();
-
     }
               
     public Board(Board board) {
+    	
+    	this.pieceChanged = board.pieceChanged;
+    	
+    	//for (Board b: board.previousBoards) {
+    	//	this.previousBoards.add(b);
+    	//}
+
+    	this.isK = board.isK;
+    	this.isk = board.isk;
                              
         char[][] grid = board.getPieces();
         
@@ -68,6 +80,15 @@ public class Board {
             }
         }
         
+        /*
+        if (previousBoards.size() < 6) {
+        	previousBoards.add(board);
+        }
+        else {
+        	previousBoards.poll();
+        	previousBoards.add(board);
+        }*/
+        
         updateGame();
 
     }
@@ -77,22 +98,33 @@ public class Board {
         xVal = 0;
         XVal = 0;
         
+        boolean doubleCheckk = false;
+        boolean doubleCheckK = false;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (pieces[i][j] == 'x') {
                     XVal+= 3;
                 }
                 if (pieces[i][j] == 'k') {
+                	doubleCheckk = true;
                     XVal+= 5;
                 }
                 if (pieces[i][j] == 'X') {
                     xVal+= 3;
                 }
                 if (pieces[i][j] == 'K') {
+                	doubleCheckK = true;
                     xVal+= 5;
                 }
             }
         } 
+        
+        if (doubleCheckK == false) {
+        	isK = false;
+        }
+        if (doubleCheckk == false) {
+        	isk = false;
+        }
         
         boolean killConfirmx = false;
         boolean killConfirmX = false;
@@ -196,33 +228,82 @@ public class Board {
     }
     
     
-    public int getTotalScore(char player) {
+    public double getTotalScore(char player) {
         
     	int tempx = 0;
         int tempX = 0;
         
+        int numKings = 0;
+        int numkings = 0;
+        
+        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (pieces[i][j] == 'x') {
-                    tempX+= 3;
+                	tempx+= 11 - (i + 3);
                 }
                 if (pieces[i][j] == 'k') {
-                    tempX+= 5;
+                    tempx+= 10;
+                    numkings++;
                 }
                 if (pieces[i][j] == 'X') {
-                    tempx+= 3;
+                    tempX+= 3 + (i - 3);
                 }
                 if (pieces[i][j] == 'K') {
-                    tempx+= 5;
+                    tempX+= 10;
+                	numKings++;
                 }
             }
         }
-
-        totalScorex = tempX - tempx;           
-
-        totalScoreX = tempx - tempX;
         
-    	
+        
+        
+        if (numKings != 0 || numkings != 0) {
+            if (numkings >= numKings) {
+            	ArrayList<ArrayList<Integer>> kings = getKingsLeft('x');
+
+            	for (ArrayList<Integer> piece: kings) {
+            		for (int i = 0; i < 8; i++) {
+            			for (int j = 0; j < 8; j++) {
+            	            if (pieces[i][j] == 'K') {
+            	            	double xSquared = Math.pow((piece.get(0) - j), 2);
+            	            	double ySquared = Math.pow((piece.get(1) - i), 2);
+            	            	double tempDist = Math.sqrt((xSquared + ySquared));
+            	            	tempx -= 1 * tempDist;
+        	                }
+            			}
+            		}
+            	}
+            	
+            }
+            else if (numkings <= numKings){
+            	ArrayList<ArrayList<Integer>> Kings = getKingsLeft('X');
+            	
+            	for (ArrayList<Integer> piece: Kings) {
+            		for (int i = 0; i < 8; i++) {
+            			for (int j = 0; j < 8; j++) {
+            	            if (pieces[i][j] == 'k') {
+            	            	double xSquared = Math.pow((piece.get(0) - j), 2);
+            	            	double ySquared = Math.pow((piece.get(1) - i), 2);
+            	            	double tempDist = Math.sqrt((xSquared + ySquared));
+            	            	tempX -= tempDist;
+        	                }
+            			}
+            		}
+            	}
+            }
+        }
+
+        
+        if (isStale()) {
+            totalScoreX = tempX - tempx - 10000;
+            totalScorex = tempx - tempX - 10000;
+        }
+        else {
+            totalScoreX = tempX - tempx;
+            totalScorex = tempx - tempX;
+        }
+        
     	if (player == 'x') {
     		return totalScorex;
     	}
@@ -241,7 +322,15 @@ public class Board {
     	}
                          
     }
-              
+      
+    public boolean getisk() {
+    	return isk;
+    }
+    
+    public boolean getisK() {
+    	return isK;
+    }
+    
     public char[][] getPieces(){
         return pieces;
     }
@@ -270,6 +359,7 @@ public class Board {
              newPlacement(targetx, targety, replace);
              pieces[targetx-1][targety+1] = 'O';
              pieces[bpx][bpy] = 'O';
+             //pieceChanged = 0;
              updateGame();
              doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
              if (doubleJump) {
@@ -280,7 +370,6 @@ public class Board {
                      turn = 'x';
                  }
              }
-             
              return true;
          
         }
@@ -293,6 +382,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
             if (doubleJump) {
@@ -314,6 +404,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
@@ -335,6 +426,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
@@ -356,6 +448,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             if (doubleJump) {
@@ -377,6 +470,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
             if (doubleJump) {
@@ -398,6 +492,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
@@ -419,6 +514,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
@@ -441,6 +537,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
             if (doubleJump) {
@@ -462,6 +559,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety+1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
                 if (doubleJump) {
@@ -483,6 +581,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx+1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
             if (doubleJump) {
@@ -504,6 +603,7 @@ public class Board {
             newPlacement(targetx, targety, replace);
             pieces[targetx-1][targety-1] = 'O';
             pieces[bpx][bpy] = 'O';
+            //pieceChanged = 0;
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
             if (doubleJump) {
@@ -524,6 +624,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -535,6 +636,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -546,6 +648,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -557,6 +660,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true; 
         }
@@ -568,6 +672,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -579,6 +684,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -590,6 +696,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -601,6 +708,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -613,6 +721,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -625,6 +734,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -637,6 +747,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -648,6 +759,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -659,6 +771,7 @@ public class Board {
             char replace = pieces[bpx][bpy];
             newPlacement(targetx, targety, replace);
             pieces[bpx][bpy] = 'O';
+            pieceChanged++;
             updateGame();
             return true;
         }
@@ -685,7 +798,6 @@ public class Board {
         }
 
         }catch(Exception e) {
-
         }
         
         try {
@@ -702,7 +814,6 @@ public class Board {
             return true;
         }
         }catch(Exception e) {
-
         }
 
         try {
@@ -719,7 +830,6 @@ public class Board {
             return true;
         }
         }catch (Exception e) {
-
         }
 
         try {
@@ -736,7 +846,6 @@ public class Board {
                 return true;
             }
         } catch (Exception e) {
-
         }
                                                           
         try {
@@ -753,7 +862,6 @@ public class Board {
                 return true;
             }
         } catch (Exception e) {
-
         }
 
                              
@@ -789,7 +897,6 @@ public class Board {
                 return true;
         }
         } catch (Exception e) {
-
         }
 
         try {
@@ -807,10 +914,9 @@ public class Board {
         }
 
         } catch (Exception e) {
-
         }
               
-    return false;
+        return false;
 
     }
     
@@ -838,22 +944,21 @@ public class Board {
         if (side == 'x') {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    if (pieces[i][j] == 'x') {
-                        
-                        pReturned.add(new ArrayList<>());
-                        pReturned.get(pieceCounter).add(j);
-                        pReturned.get(pieceCounter).add(i);
-                                        pieceCounter++;
+                    if (pieces[i][j] == 'x') {         
+	                        pReturned.add(new ArrayList<>());
+	                        pReturned.get(pieceCounter).add(j);
+	                        pReturned.get(pieceCounter).add(i);
+	                        pieceCounter++;
                         }
                         if (pieces[i][j] == 'k') {
                             pReturned.add(new ArrayList<>());
                             pReturned.get(pieceCounter).add(j);
                             pReturned.get(pieceCounter).add(i);
                             pieceCounter++;
-                    }
-                }
-            }
-        }
+                        }
+                	}
+            	}
+        	}
         else {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
@@ -863,6 +968,40 @@ public class Board {
                         pReturned.get(pieceCounter).add(i);
                         pieceCounter++;
                     }
+                    if (pieces[i][j] == 'K') {
+                        pReturned.add(new ArrayList<>());
+                        pReturned.get(pieceCounter).add(j);
+                        pReturned.get(pieceCounter).add(i);
+                        pieceCounter++;
+                    }
+                }
+            }
+        }
+        
+        return pReturned;
+                        
+    }
+    
+    public ArrayList<ArrayList<Integer>> getKingsLeft(char side) {
+        
+        ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
+        int pieceCounter = 0;
+        
+        if (side == 'x') {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                        if (pieces[i][j] == 'k') {
+                            pReturned.add(new ArrayList<>());
+                            pReturned.get(pieceCounter).add(j);
+                            pReturned.get(pieceCounter).add(i);
+                            pieceCounter++;
+                        }
+                	}
+            	}
+        	}
+        else {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
                     if (pieces[i][j] == 'K') {
                         pReturned.add(new ArrayList<>());
                         pReturned.get(pieceCounter).add(j);
@@ -888,6 +1027,8 @@ public class Board {
             turn = 'x';
         }
             pieces[x][y] = 'K';
+            isK = true;
+            pieceChanged = 0;
         }
         else if (replace == 'x' && y == 7) {
             if (turn == 'x') {
@@ -897,6 +1038,8 @@ public class Board {
                 turn = 'x';
             }
             pieces[x][y] = 'k';
+            isk = true;
+            pieceChanged = 0;
         }
         else {
             if (turn == 'x') {
@@ -997,10 +1140,13 @@ public class Board {
     }
     
 
-	public boolean isEqual(Board minBoard) {
+	public boolean isEqual(Board otherBoard) {
+		
+		char[][] temp = otherBoard.getPieces();
+		
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (pieces[i][j] != minBoard.getPieces()[i][j]) {
+                if (pieces[i][j] != temp[i][j]) {
                 	return false;
                 }
             }
@@ -1009,5 +1155,22 @@ public class Board {
         return true;
 	}
                     
-    
+	
+	public boolean isStale() {
+
+		int counter = 0;
+
+		//for (Board b : this.previousBoards) {
+		//	if (b.isEqual(this)) {
+		//		counter++;
+		//	}
+		//}
+		
+		if (counter == 3) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 }
