@@ -69,7 +69,7 @@ public class Player {
 	
 	public double MaxValue(Board board, int depth, char player, Double alpha, Double beta) {
 		
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {	
+		if (depth == 6 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {	
 			return board.getTotalScore(player);
 		}
 		else {
@@ -112,7 +112,7 @@ public class Player {
 	
 	public double MinValue(Board board, int depth, char player, Double alpha, Double beta) {
 
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {		
+		if (depth == 6 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {		
 			return board.getTotalScore(player);
 			
 		}

@@ -261,35 +261,36 @@ public class Board {
         if (numKings != 0 || numkings != 0) {
             if (numkings >= numKings) {
             	ArrayList<ArrayList<Integer>> kings = getKingsLeft('x');
-
+            	
             	for (ArrayList<Integer> piece: kings) {
+                	double tempDist = 0;
             		for (int i = 0; i < 8; i++) {
             			for (int j = 0; j < 8; j++) {
             	            if (pieces[i][j] == 'K') {
             	            	double xSquared = Math.pow((piece.get(0) - j), 2);
             	            	double ySquared = Math.pow((piece.get(1) - i), 2);
-            	            	double tempDist = Math.sqrt((xSquared + ySquared));
-            	            	tempx -= 1 * tempDist;
+            	            	tempDist = Math.sqrt((xSquared + ySquared));
         	                }
             			}
             		}
+                	tempx -= tempDist;
             	}
-            	
             }
             else if (numkings <= numKings){
             	ArrayList<ArrayList<Integer>> Kings = getKingsLeft('X');
             	
             	for (ArrayList<Integer> piece: Kings) {
+            		double tempDist = 0;
             		for (int i = 0; i < 8; i++) {
             			for (int j = 0; j < 8; j++) {
             	            if (pieces[i][j] == 'k') {
             	            	double xSquared = Math.pow((piece.get(0) - j), 2);
             	            	double ySquared = Math.pow((piece.get(1) - i), 2);
-            	            	double tempDist = Math.sqrt((xSquared + ySquared));
-            	            	tempX -= tempDist;
+            	            	 tempDist = Math.sqrt((xSquared + ySquared));
         	                }
             			}
             		}
+	            	tempX -= tempDist;
             	}
             }
         }
