@@ -15,4 +15,4 @@ Playing the game
 Changing the game
 1. changing the depth in the MinValue and MaxValue is possible by changing the base case return conditions in those methods
 2. i would not recommend changing the depth beyond 6 as the performance is doable but slow 
-2. to look at the scoring mechanics, the getTotalScore method in the board class is where the scoring mechanics are
+2. to look at the scoring mechanics, the getTotalScore method in the board class is where the scoring mechanics and heuristics are
