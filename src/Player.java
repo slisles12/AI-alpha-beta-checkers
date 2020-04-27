@@ -62,7 +62,7 @@ public class Player {
 	public double MaxValue(Board board, int depth, char player, Double alpha, Double beta) {
 		
 		//if we have reached the end of our leaves
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
+		if (depth == 6 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
 			//return score
 			return board.getTotalScore(player);
 		}
@@ -127,7 +127,7 @@ public class Player {
 	public double MinValue(Board board, int depth, char player, Double alpha, Double beta) {
 
 		//if we have reached the end of our leaves
-		if (depth == 5 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
+		if (depth == 6 || board.getBlueScore() == 0 || board.getWhiteScore() == 0) {
 			//return score
 			return board.getTotalScore(player);
 		}

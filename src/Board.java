@@ -358,7 +358,7 @@ public class Board {
 	/**
 	* method to return and compute the heuristic score of a player
 	* @param char player is the player we are calculating for
-	* @retunr double is the heuristic score for the player
+	* @return double is the heuristic score for the player
 	*/
     public double getTotalScore(char player) {
         
@@ -493,40 +493,60 @@ public class Board {
     	return totalScoreX;
                          
     }
-               
-    public ArrayList<ArrayList<Integer>> getPiecesLeft(char side) {
-                         
+         
+	/**
+	* method to get the pieces that are left for the given player
+	* @param char player whose turn it is
+	* @return ArrayList<ArrayList<Integer>> is the list of the positions of each peace
+	*/
+    public ArrayList<ArrayList<Integer>> getPiecesLeft(char player) {
+             
+    	//list of pieces to be returned
         ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
+        
+        //counter starts at 0
         int pieceCounter = 0;
         
-        if (side == 'x') {
+        //if player is white
+        if (player == 'x') {
+        	//check the grid of all the pieces
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    if (pieces[i][j] == 'x') {         
+                	//if the piece is white
+                    if (pieces[i][j] == 'x') {   
+                    		//add the piece to the lsit
 	                        pReturned.add(new ArrayList<>());
 	                        pReturned.get(pieceCounter).add(j);
 	                        pReturned.get(pieceCounter).add(i);
 	                        pieceCounter++;
                         }
-                        if (pieces[i][j] == 'k') {
-                            pReturned.add(new ArrayList<>());
-                            pReturned.get(pieceCounter).add(j);
-                            pReturned.get(pieceCounter).add(i);
-                            pieceCounter++;
-                        }
-                	}
-            	}
-        	}
+                    //if the piece is a white king
+                    if (pieces[i][j] == 'k') {
+                    	//add the piece to the list
+                    	pReturned.add(new ArrayList<>());
+                    	pReturned.get(pieceCounter).add(j);
+                    	pReturned.get(pieceCounter).add(i);
+                    	pieceCounter++;
+                    }
+                }
+            }
+        }
+        //if the player is blue
         else {
+        	//check each piece in the grid
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
+                	//if the piece is blue
                     if (pieces[i][j] == 'X') {
+                    	//add the piece to the list
                         pReturned.add(new ArrayList<>());
                         pReturned.get(pieceCounter).add(j);
                         pReturned.get(pieceCounter).add(i);
                         pieceCounter++;
                     }
+                    //if the piece is a blue king
                     if (pieces[i][j] == 'K') {
+                    	//add the piece to the list
                         pReturned.add(new ArrayList<>());
                         pReturned.get(pieceCounter).add(j);
                         pReturned.get(pieceCounter).add(i);
@@ -536,31 +556,48 @@ public class Board {
             }
         }
         
+        //return the list
         return pReturned;
                         
     }
     
-    public ArrayList<ArrayList<Integer>> getKingsLeft(char side) {
+	/**
+	* method to get the kings left for the given player
+	* @param char player is the player we are calculating for
+	* @return ArrayList<ArrayList<Integer>> is the list of positions of the king pieces
+	*/
+    public ArrayList<ArrayList<Integer>> getKingsLeft(char player) {
         
+    	//list of the positions of the kings to be returned
         ArrayList<ArrayList<Integer>> pReturned = new ArrayList<ArrayList<Integer>>();
+        
+        //counter starts at 0
         int pieceCounter = 0;
         
-        if (side == 'x') {
+        //if the player is white
+        if (player == 'x') {
+        	//for each piece in the grids
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                        if (pieces[i][j] == 'k') {
-                            pReturned.add(new ArrayList<>());
-                            pReturned.get(pieceCounter).add(j);
-                            pReturned.get(pieceCounter).add(i);
-                            pieceCounter++;
-                        }
+                	//if the piece is a white king
+                	if (pieces[i][j] == 'k') {
+                		//add the piece to the list
+                		pReturned.add(new ArrayList<>());
+                		pReturned.get(pieceCounter).add(j);
+                		pReturned.get(pieceCounter).add(i);
+                		pieceCounter++;
                 	}
-            	}
-        	}
+                }
+            }
+        }
+        //if the player is blue
         else {
+        	//for each piece in the grid
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
+                	//if the peace is a blue king
                     if (pieces[i][j] == 'K') {
+                    	//add the piece to the list
                         pReturned.add(new ArrayList<>());
                         pReturned.get(pieceCounter).add(j);
                         pReturned.get(pieceCounter).add(i);
@@ -570,171 +607,268 @@ public class Board {
             }
         }
         
+        //return the list of positions of kings
         return pReturned;
                         
     }
         
-            
+	/**
+	* method to determine the new placement of a piece
+	* @param int x is initial x position 
+	* @param int y is initial y position
+	* @param char replace is the character we are replacing with
+	*/
     public void newPlacement(int x, int y, char replace) {
-                        
+        //if we are replacing with a blue piece at king position             
         if (replace == 'X' && y == 0) {
+        	//if our turn is white
             if (turn == 'x') {
+            	//flop the turn
                 turn = 'X';
             }
-        else {
-            turn = 'x';
-        }
+	        //if we are replacing with a white piece    
+	        else {
+	        	//flop turn
+	            turn = 'x';
+	        }
+            //replace the piece with a blue king
             pieces[x][y] = 'K';
+            //notify the var
             isK = true;
         }
+        //if we are replacing with a white piece at king position
         else if (replace == 'x' && y == 7) {
+        	//if turn is white
             if (turn == 'x') {
+            	//flop turn
                 turn = 'X';
             }
+            //turn is white
             else {
                 turn = 'x';
             }
+            //make white king
             pieces[x][y] = 'k';
+            //notify the var
             isk = true;
         }
+        //if no king move
         else {
+        	//if turn is white
             if (turn == 'x') {
+            	//turn is blue
                 turn = 'X';
             }
+            //if turn is blue
             else {
+            	//turn is white
                 turn = 'x';
             }
+            //replace the piece
             pieces[x][y] = replace;
         }
                         
     }
             
+	/**
+	* method to return a list of the boards possible based on moves
+	* @param ArrayList<Integer> is the pieces to be attempted to moved
+	* @return return a list of the boards possible based on moves
+	*/
     public ArrayList<Board> nextBoards(ArrayList<Integer> current){
-                    
+             
+    	//list of new boards
         ArrayList<Board> listOfBoard = new ArrayList<Board>();
         
+        //targets and current
         int cur[] = new int[2];
         int tar[] = new int[2];
                     
+        //current
         int bpx = current.get(0);
         int bpy = current.get(1);
         
+        //set currents
         cur[0] = bpx;
         cur[1] = bpy;
 
+        //temp is a new board of this
         Board temp = new Board(this);
 
+        //new position
         tar[0] = bpx - 1;
         tar[1] = bpy - 1;
         
+        //try to swap
         if (temp.doSwap(tar, cur)) {
+        	//if we could then add board to list
             listOfBoard.add(new Board(temp));
         }
         
+        //try new positions
         tar[0] = bpx + 1;
         tar[1] = bpy - 1;
+        
+        //new board of this
         temp = new Board(this);
 
+        //try to swap
         if (temp.doSwap(tar, cur)) {
+        	//if swap then add board to list
             listOfBoard.add(new Board(temp));
         }
         
+        //try new position
         tar[0] = bpx - 1;
         tar[1] = bpy + 1;
+        //make new board with this
         temp = new Board(this);
 
+        //try to swap
         if (temp.doSwap(tar, cur)) {
+        	//if we swapped then add board to list
             listOfBoard.add(new Board(temp));
         }
         
-        
+        //try new position
         tar[0] = bpx + 1;
         tar[1] = bpy + 1;
+        
+        //make new board with this
         temp = new Board(this);
         
+        //try to do swap
         if (temp.doSwap(tar, cur)) {
+        	//if swapped then add to board
             listOfBoard.add(new Board(temp));
         }
         
-        
+        //new position
         tar[0] = bpx + 2;
         tar[1] = bpy + 2;
+        //new board with this
         temp = new Board(this);
 
+        //try to do swap
         if (temp.doSwap(tar, cur)) {
+        	//if swapped then add to board
             listOfBoard.add(new Board(temp));
         }
         
+        //new positions 
         tar[0] = bpx + 2;
         tar[1] = bpy - 2;
+        //new board with this
         temp = new Board(this);
 
+        //try to do swap
         if (temp.doSwap(tar, cur)) {
+        	//if swapped then add to board
             listOfBoard.add(new Board(temp));
         }
         
+        //new positions
         tar[0] = bpx - 2;
         tar[1] = bpy + 2;
+        //new board with this
         temp = new Board(this);
         
-
+        //try to do swap
         if (temp.doSwap(tar, cur)) {
+        	//if swapped then add to list
             listOfBoard.add(new Board(temp));
         }
         
+        //new positions
         tar[0] = bpx - 2;
         tar[1] = bpy - 2;
+        //new board with this
         temp = new Board(this);
-        
-
+    
+        //try to do swap
         if (temp.doSwap(tar, cur)) {
+        	//if swapped then add to list
             listOfBoard.add(new Board(temp));
         }             
 
+        //the list of the possible boards
         return listOfBoard;
 
     }
     
 
+    
+	/**
+	* method to see if the boards are equal
+	* @param Board otherboard is the board we are comparing to 
+	* @return boolean if the boards are equal
+	*/
 	public boolean isEqual(Board otherBoard) {
 		
+		//for every piece in the board
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+            	//if the pieces are not equal
                 if (this.getPiece(i, j) != otherBoard.getPiece(i, j)) {
+                	//return false
                 	return false;
                 }
             }
         }
         
+        //return true if they are equals
         return true;
 	}
                     
 	
+    
+	/**
+	* method to determine if stale mate
+	* @return boolean if there is a stale mate detected
+	*/
 	public boolean isStale() {
 
+		//counter set at 0
 		int counter = 0;
 
+		//for each board in the queue
 		for (Board b : this.previousBoards) {
+			//if the boards are equal
 			if (b.isEqual(getPreviousBoards().peek())) {
+				//increment the counter
 				counter++;
 			}
 		}
 		
+		//if the counter is greater than or equal to 3
 		if (counter >= 3) {
+			//return true
 			return true;
 		}
 		
 		return false;
 	}
 
+	/**
+	* method to swap pieces
+	* @param int[] target is the target piece
+	* @param int[] buttonPressed is the button we want to swap with
+	* @return boolean true if swap was done
+	*/
     public boolean doSwap(int[] target, int[] buttonPressed) {
         
+    	//button pressed
         int bpx = buttonPressed[1];
         int bpy = buttonPressed[0];
+        
+        //target
         int targetx = target[1];
         int targety = target[0];
+        
+        //do we double
         boolean doubleJump = false;
         
+        //if out of bounds return false
         if (bpx < 0 || bpy < 0 || targetx < 0 || targety < 0 || bpx > 7 || bpy > 7 || targetx > 7 || targety > 7) {
             return false;
         }
@@ -748,6 +882,8 @@ public class Board {
              pieces[targetx-1][targety+1] = 'O';
              pieces[bpx][bpy] = 'O';
              updateGame();
+             
+             //if double jump
              doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
              if (doubleJump) {
                  if (turn == 'x'){
@@ -771,6 +907,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -792,6 +930,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -813,6 +953,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -834,6 +976,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -855,6 +999,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -876,6 +1022,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -897,6 +1045,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                 	turn = 'X';
@@ -919,6 +1069,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                 	turn = 'X';
@@ -940,14 +1092,16 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
-                if (doubleJump) {
-                    if (turn == 'x'){
-                        turn = 'X';
-                    }
-                    else {
-                        turn = 'x';
-                    }
+            
+            //if double jump
+            if (doubleJump) {
+                if (turn == 'x'){
+                    turn = 'X';
                 }
+                else {
+                    turn = 'x';
+                }
+            }
             return true;
         }
                                 
@@ -961,6 +1115,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx - 2, bpy + 2, pieces[bpx-2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -982,6 +1138,8 @@ public class Board {
             pieces[bpx][bpy] = 'O';
             updateGame();
             doubleJump = attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+            
+            //if double jump
             if (doubleJump) {
                 if (turn == 'x'){
                     turn = 'X';
@@ -1138,14 +1296,21 @@ public class Board {
             updateGame();
             return true;
         }
-                           
+        
+        //we could not swap
         return false;
     }
               
-              
+	/**
+	* method to attempt double jumps
+	* @param int bpx x position
+	* @param int bpy y position
+	* @param char current is the current player we are trying to double jump with
+	* @return boolean true if swap was done
+	*/
     public boolean attemptDouble(int bpx, int bpy, char current) {
 
-                    
+    //try for out of bounds stuff
     try {
     	//handling doubles of big bois
         if ((pieces[bpx-2][bpy+2] == 'O') && 
@@ -1156,13 +1321,15 @@ public class Board {
             pieces[bpx-1][bpy+1] = 'O';
             pieces[bpx][bpy] = 'O';
             updateGame();
-            attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
+            attemptDouble(bpx-2, bpy+2, current);
             return true;
         }
 
         }catch(Exception e) {
         }
         
+
+    	//try for out of bounds stuff
         try {
         //handling doubles of big bois
         if ((pieces[bpx-2][bpy-2] == 'O') &&
@@ -1173,12 +1340,14 @@ public class Board {
             pieces[bpx-1][bpy-1] = 'O';
             pieces[bpx][bpy] = 'O';
             updateGame();
-            attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+            attemptDouble(bpx - 2, bpy - 2, current);
             return true;
         }
         }catch(Exception e) {
         }
 
+
+        //try for out of bounds stuff
         try {
         //handling doubles of big bois
         if ((pieces[bpx+2][bpy-2] == 'O') &&
@@ -1189,12 +1358,13 @@ public class Board {
             pieces[bpx+1][bpy-1] = 'O';
             pieces[bpx][bpy] = 'O';
             updateGame();
-            attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+            attemptDouble(bpx + 2, bpy - 2, current);
             return true;
         }
         }catch (Exception e) {
         }
 
+        //try for out of bounds stuff
         try {
             //handling doubles of big bois
             if ((pieces[bpx+2][bpy+2] == 'O') &&
@@ -1205,12 +1375,13 @@ public class Board {
                 pieces[bpx+1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
                 updateGame();
-                attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+                attemptDouble(bpx + 2, bpy + 2, current);
                 return true;
             }
         } catch (Exception e) {
         }
-                                                          
+             
+        //try for out of bounds stuff
         try {
             //handling doubles of small bois
             if ((pieces[bpx-2][bpy+2] == 'O') &&
@@ -1221,13 +1392,13 @@ public class Board {
                 pieces[bpx-1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
                 updateGame();
-                attemptDouble(bpx-2, bpy+2, pieces[bpx-2][bpy+2]);
+                attemptDouble(bpx-2, bpy+2, current);
                 return true;
             }
         } catch (Exception e) {
         }
 
-                             
+        //try for out of bounds stuff
         try {
             //handling doubles of small bois
             if ((pieces[bpx-2][bpy-2] == 'O') &&
@@ -1238,14 +1409,14 @@ public class Board {
                 pieces[bpx-1][bpy-1] = 'O';
                 pieces[bpx][bpy] = 'O';
                 updateGame();
-                attemptDouble(bpx - 2, bpy - 2, pieces[bpx-2][bpy-2]);
+                attemptDouble(bpx - 2, bpy - 2, current);
                 return true;
             }
         } catch (Exception e) {
 
-        }
-                             
-                             
+        }               
+
+        //try for out of bounds stuff           
         try {
             //handling doubles of small bois
             if ((pieces[bpx+2][bpy-2] == 'O') &&
@@ -1256,12 +1427,13 @@ public class Board {
                 pieces[bpx+1][bpy-1] = 'O';
                 pieces[bpx][bpy] = 'O';
                 updateGame();
-                attemptDouble(bpx + 2, bpy - 2, pieces[bpx+2][bpy-2]);
+                attemptDouble(bpx + 2, bpy - 2, current);
                 return true;
         }
         } catch (Exception e) {
         }
 
+        //try for out of bounds stuff
         try {
             //handling doubles of small bois
             if ((pieces[bpx+2][bpy+2] == 'O') && 
@@ -1272,13 +1444,14 @@ public class Board {
                 pieces[bpx+1][bpy+1] = 'O';
                 pieces[bpx][bpy] = 'O';
                 updateGame();
-                attemptDouble(bpx + 2, bpy + 2, pieces[bpx+2][bpy+2]);
+                attemptDouble(bpx + 2, bpy + 2, current);
                 return true;
         }
 
         } catch (Exception e) {
         }
               
+        //we could not double jump
         return false;
 
     }
